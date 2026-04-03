@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>領導者高衝突評鑑題本</title>
+  <style>
+    :root {
+      --bg: #f5f3ef;
+      --surface: #fbfaf8;
+      --surface-strong: #ffffff;
+      --ink: #1f2933;
+      --ink-soft: #52606d;
+      --border: #d9e0e6;
+      --primary: #2f4353;
+      --primary-strong: #1f2f3c;
+      --accent: #8d7b4e;
+      --accent-soft: rgba(141, 123, 78, 0.14);
+      --success: #355e4e;
+      --warning: #8d4a45;
+      --warning-soft: rgba(141, 74, 69, 0.08);
+      --shadow: 0 18px 48px rgba(28, 39, 49, 0.08);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --max-width: 1240px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(141, 123, 78, 0.08), transparent 26%),
+        linear-gradient(180deg, #f2efea 0%, #f6f4f0 40%, #f3f1ed 100%);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page-shell {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 32px 20px 64px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(47, 67, 83, 0.14);
+      border-radius: 30px;
+      padding: 48px 48px 40px;
+      background:
+        linear-gradient(135deg, rgba(47, 67, 83, 0.98), rgba(36, 50, 64, 0.96)),
+        #243240;
+      color: #f9f7f3;
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -10% -40% auto;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(141, 123, 78, 0.18), transparent 72%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.92rem;
+      letter-spacing: 0.04em;
+    }
+
+    .hero h1 {
+      margin: 18px 0 10px;
+      font-size: clamp(2rem, 4vw, 3.35rem);
+      line-height: 1.18;
+      letter-spacing: 0.02em;
+    }
+
+    .hero .subtitle {
+      max-width: 780px;
+      margin: 0 0 20px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: clamp(1rem, 2vw, 1.16rem);
+    }
+
+    .hero .intro {
+      max-width: 760px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .button {
+      appearance: none;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 12px 22px;
+      cursor: pointer;
+      transition: transform 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button-primary {
+      background: linear-gradient(135deg, #b49c63, #8d7b4e);
+      color: #fefcf8;
+      box-shadow: 0 10px 24px rgba(141, 123, 78, 0.24);
+    }
+
+    .button-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: #f4efe7;
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .button-outline {
+      background: transparent;
+      color: var(--primary);
+      border-color: rgba(47, 67, 83, 0.2);
+    }
+
+    .panel {
+      margin-top: 26px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(47, 67, 83, 0.12);
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: var(--shadow);
+    }
+
+    .section {
+      padding: 32px;
+    }
+
+    .section + .section {
+      border-top: 1px solid rgba(47, 67, 83, 0.08);
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 1.4rem;
+      color: var(--primary-strong);
+    }
+
+    .section-desc {
+      margin: 0;
+      color: var(--ink-soft);
+    }
+
+    .instruction-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    .instruction-card {
+      padding: 18px 18px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(47, 67, 83, 0.12);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 247, 244, 0.95));
+    }
+
+    .instruction-card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: var(--primary);
+    }
+
+    .instruction-card p,
+    .instruction-card li {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.96rem;
+    }
+
+    .instruction-card ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 24px;
+      margin-top: 24px;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 20px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .sticky-card {
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(47, 67, 83, 0.12);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: var(--shadow);
+    }
+
+    .sticky-card h3 {
+      margin: 0 0 8px;
+      color: var(--primary);
+      font-size: 1rem;
+    }
+
+    .progress-number {
+      margin: 4px 0 10px;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--primary-strong);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #e6ecef;
+      overflow: hidden;
+    }
+
+    .progress-bar > span {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #6f88a1, #8d7b4e);
+      transition: width 0.2s ease;
+    }
+
+    .status-list {
+      margin: 14px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+    }
+
+    .status-list strong {
+      color: var(--primary-strong);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: #f2f5f7;
+    }
+
+    .status-badge.warning {
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .status-badge.success {
+      background: rgba(53, 94, 78, 0.1);
+      color: var(--success);
+    }
+
+    .nav-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0;
+      border-radius: 12px;
+      border: 1px solid rgba(47, 67, 83, 0.12);
+      background: #f9faf9;
+      color: var(--ink-soft);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--primary-strong);
+      border-color: rgba(47, 67, 83, 0.22);
+      background: rgba(47, 67, 83, 0.06);
+    }
+
+    .question-list {
+      display: grid;
+      gap: 20px;
+    }
+
+    .question-card {
+      padding: 26px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(47, 67, 83, 0.12);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: var(--shadow);
+      scroll-margin-top: 20px;
+    }
+
+    .question-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .question-number {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+      font-size: 0.94rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .question-title {
+      margin: 8px 0 10px;
+      color: var(--primary-strong);
+      font-size: 1.3rem;
+    }
+
+    .question-scenario {
+      margin: 0;
+      color: var(--ink-soft);
+    }
+
+    .question-sum {
+      min-width: 148px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: #f0f4f6;
+      text-align: center;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .question-sum.invalid {
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .option-card {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(47, 67, 83, 0.12);
+      background: linear-gradient(180deg, rgba(247, 249, 250, 0.96), rgba(255, 255, 255, 0.96));
+    }
+
+    .option-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .option-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .option-pill {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(47, 67, 83, 0.1);
+      color: var(--primary-strong);
+    }
+
+    .score-input {
+      width: 82px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(47, 67, 83, 0.18);
+      background: #fff;
+      color: var(--ink);
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .score-input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: rgba(47, 67, 83, 0.45);
+      box-shadow: 0 0 0 4px rgba(47, 67, 83, 0.08);
+    }
+
+    .option-card p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.96rem;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .field-group {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field-group label {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    textarea {
+      min-height: 108px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(47, 67, 83, 0.16);
+      background: #fff;
+      resize: vertical;
+      color: var(--ink);
+    }
+
+    .radio-group {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      align-content: start;
+      margin-top: 6px;
+    }
+
+    .radio-card {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(47, 67, 83, 0.16);
+      background: #fff;
+      cursor: pointer;
+      color: var(--ink-soft);
+      font-weight: 700;
+      transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+    }
+
+    .radio-card input {
+      margin: 0;
+    }
+
+    .radio-card.selected {
+      border-color: rgba(47, 67, 83, 0.38);
+      background: rgba(47, 67, 83, 0.08);
+      color: var(--primary-strong);
+    }
+
+    .question-warning {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: var(--warning-soft);
+      color: var(--warning);
+      font-weight: 700;
+    }
+
+    .question-warning.visible {
+      display: block;
+    }
+
+    .submit-wrap {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(47, 67, 83, 0.12);
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: var(--shadow);
+    }
+
+    .submit-hint {
+      color: var(--ink-soft);
+      max-width: 720px;
+    }
+
+    .global-error {
+      display: none;
+      margin-top: 16px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(141, 74, 69, 0.18);
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .global-error.visible {
+      display: block;
+    }
+
+    .result-panel {
+      display: none;
+      margin-top: 28px;
+      border-radius: 28px;
+      border: 1px solid rgba(47, 67, 83, 0.14);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(249, 248, 245, 0.96));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .result-panel.visible {
+      display: block;
+    }
+
+    .result-header {
+      padding: 34px 32px 24px;
+      background: linear-gradient(135deg, rgba(47, 67, 83, 0.06), rgba(141, 123, 78, 0.08));
+    }
+
+    .result-header h2 {
+      margin: 0 0 8px;
+      color: var(--primary-strong);
+      font-size: 1.8rem;
+    }
+
+    .result-header p {
+      margin: 0;
+      color: var(--ink-soft);
+      max-width: 880px;
+    }
+
+    .result-body {
+      padding: 28px 32px 34px;
+      display: grid;
+      gap: 28px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .summary-card {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(47, 67, 83, 0.12);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .summary-card .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(47, 67, 83, 0.08);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .summary-card strong {
+      display: block;
+      margin-top: 10px;
+      color: var(--primary-strong);
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .summary-card p {
+      margin: 8px 0 0;
+      color: var(--ink-soft);
+    }
+
+    .chart {
+      display: grid;
+      gap: 14px;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: 180px minmax(0, 1fr) 56px;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .chart-label {
+      color: var(--primary-strong);
+      font-weight: 700;
+    }
+
+    .chart-track {
+      position: relative;
+      width: 100%;
+      height: 16px;
+      border-radius: 999px;
+      background: #ebeff2;
+      overflow: hidden;
+    }
+
+    .chart-bar {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #738ca2, #8d7b4e);
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 20px;
+    }
+
+    .interpret-card,
+    .maturity-card,
+    .details-card {
+      padding: 22px;
+      border-radius: 20px;
+      border: 1px solid rgba(47, 67, 83, 0.12);
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .interpret-card h3,
+    .maturity-card h3,
+    .details-card h3 {
+      margin: 0 0 12px;
+      color: var(--primary-strong);
+    }
+
+    .interpret-card p,
+    .maturity-card p,
+    .details-card p,
+    .details-card li {
+      color: var(--ink-soft);
+      margin: 0;
+    }
+
+    .interpret-list,
+    .maturity-card ol {
+      margin: 12px 0 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 8px;
+      color: var(--ink-soft);
+    }
+
+    .result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    details {
+      border-top: 1px solid rgba(47, 67, 83, 0.1);
+      padding-top: 14px;
+    }
+
+    details + details {
+      margin-top: 14px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--primary);
+      font-weight: 700;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .detail-content {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+      color: var(--ink-soft);
+    }
+
+    .detail-score-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .detail-score-grid span {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #f5f7f8;
+      color: var(--primary);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .floating-save {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 40;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(31, 47, 60, 0.92);
+      color: #f8f4ec;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .floating-save.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .muted {
+      color: var(--ink-soft);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1024px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .summary-grid,
+      .result-grid,
+      .option-grid,
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .page-shell {
+        padding: 18px 14px 52px;
+      }
+
+      .hero {
+        padding: 28px 20px;
+        border-radius: 24px;
+      }
+
+      .section,
+      .question-card,
+      .result-header,
+      .result-body,
+      .sticky-card,
+      .submit-wrap {
+        padding: 20px;
+      }
+
+      .instruction-grid,
+      .radio-group {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-list {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .question-top {
+        flex-direction: column;
+      }
+
+      .question-sum {
+        width: 100%;
+      }
+
+      .submit-wrap {
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-eyebrow">Leadership Conflict Assessment</div>
+      <h1>領導者高衝突評鑑題本</h1>
+      <p class="subtitle">在高衝突、多重壓力與無標準答案的情境中，看見你真正優先保護的是什麼。</p>
+      <p class="intro">
+        這不是對錯測驗，而是一份取捨與代價的測驗。你要做的不是把自己寫成完美領導者，而是誠實呈現：當四種重要價值無法同時被保住時，你會先保什麼、願意失去什麼、最害怕失去什麼。
+      </p>
+      <div class="hero-actions">
+        <button class="button button-primary" id="start-button" type="button">開始作答</button>
+        <button class="button button-secondary" id="jump-result-button" type="button">查看結果說明</button>
+      </div>
+    </header>
+
+    <section class="panel" id="instruction-panel">
+      <div class="section">
+        <h2 class="section-title">作答說明</h2>
+        <p class="section-desc">請以真實偏好作答，而不是填寫理想答案。每題都需要做出分配、說明理由，並正視你最不願意選擇的方向。</p>
+        <div class="instruction-grid">
+          <article class="instruction-card">
+            <h3>分數規則</h3>
+            <ul>
+              <li>每題有 A / B / C / D 四個選項。</li>
+              <li>請將 <strong>10 分</strong> 分配給四個選項，可為 0 分。</li>
+              <li>每題四個選項加總 <strong>必須等於 10</strong>。</li>
+            </ul>
+          </article>
+          <article class="instruction-card">
+            <h3>每題必填內容</h3>
+            <ul>
+              <li>核心理由</li>
+              <li>願意承擔的代價</li>
+              <li>最不願意選的方向（A / B / C / D）</li>
+            </ul>
+          </article>
+          <article class="instruction-card">
+            <h3>評鑑提醒</h3>
+            <ul>
+              <li>沒有標準答案，也不是價值高下排序。</li>
+              <li>重點在於你此刻先保護什麼，而不是事後如何包裝。</li>
+              <li>高成熟度常來自對代價的清楚，而不是對立場的漂亮描述。</li>
+            </ul>
+          </article>
+          <article class="instruction-card">
+            <h3>附加功能</h3>
+            <ul>
+              <li>系統會即時計算每題總分與整體進度。</li>
+              <li>作答內容會自動暫存於本機瀏覽器。</li>
+              <li>提交後可列印結果、匯出 JSON，並展開查看逐題摘要。</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout" id="assessment-layout">
+      <aside class="sidebar">
+        <div class="sticky-card">
+          <h3>作答進度</h3>
+          <div class="progress-number" id="progress-number">0 / 12</div>
+          <div class="progress-bar" aria-hidden="true"><span id="progress-bar-fill"></span></div>
+          <ul class="status-list">
+            <li class="status-badge" id="completion-status">尚未完成任何題目</li>
+            <li class="status-badge" id="sum-status">尚未檢查分數加總</li>
+            <li class="status-badge" id="storage-status">本機暫存：尚未儲存</li>
+          </ul>
+        </div>
+
+        <div class="sticky-card">
+          <h3>快速跳題</h3>
+          <p class="muted">可快速跳到任一題；完成題目會維持綠色提示。</p>
+          <div class="nav-list" id="question-nav"></div>
+        </div>
+      </aside>
+
+      <main>
+        <div class="question-list" id="question-list"></div>
+
+        <div class="global-error" id="global-error"></div>
+
+        <div class="submit-wrap">
+          <div class="submit-hint">
+            提交前系統會檢查每題是否填妥、總分是否等於 10，以及是否有遺漏的理由、代價與最不願選方向。
+          </div>
+          <button class="button button-primary" id="submit-button" type="button">提交並產生結果</button>
+        </div>
+
+        <section class="result-panel" id="result-panel">
+          <div class="result-header">
+            <h2>評鑑結果</h2>
+            <p id="result-summary-text">提交後將顯示你的四向度總分、主要傾向與文字解讀。</p>
+          </div>
+          <div class="result-body">
+            <div class="summary-grid" id="summary-grid"></div>
+
+            <div class="interpret-card">
+              <h3>四向度可視化</h3>
+              <div class="chart" id="result-chart"></div>
+            </div>
+
+            <div class="result-grid">
+              <div class="interpret-card">
+                <h3>結果解讀</h3>
+                <p id="result-primary-interpretation"></p>
+                <ul class="interpret-list" id="interpret-list"></ul>
+              </div>
+
+              <div class="maturity-card">
+                <h3>成熟度判斷提示</h3>
+                <p>成熟的受測者通常不急著把自己寫成兼顧一切的人，而是能清楚說出自己在當下先保什麼、願付什麼代價。</p>
+                <ol>
+                  <li>不會每題平均分配。</li>
+                  <li>理由裡會談代價，而不只談立場。</li>
+                  <li>能承認自己最怕失去什麼。</li>
+                  <li>不會把自己寫成永遠兼顧一切的人。</li>
+                  <li>能分清「此刻先保什麼」與「之後怎麼補救」。</li>
+                </ol>
+              </div>
+            </div>
+
+            <div class="result-actions">
+              <button class="button button-primary" id="print-button" type="button">列印結果</button>
+              <button class="button button-outline" id="export-button" type="button">匯出 JSON</button>
+              <button class="button button-outline" id="restart-button" type="button">重新作答</button>
+            </div>
+
+            <div class="details-card">
+              <h3>逐題作答摘要</h3>
+              <p>可展開檢視每一題的分數分配、理由、願付代價與最不願選方向。</p>
+              <div id="result-details"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </section>
+  </div>
+
+  <div class="floating-save" id="save-indicator">已自動暫存作答內容</div>
+
+  <script>
+    // 題目資料以陣列管理，方便維護與擴充。
+    const QUESTIONS = [
+      {
+        id: 1,
+        title: "現金流急凍與發薪壓力",
+        scenario: "公司連續兩季營收不如預期，本月現金流僅足以支撐六週。投資人要求你立刻提出止血方案，否則下一輪融資可能暫停。核心幹部則擔心一旦啟動大規模縮編，團隊士氣會直接崩盤。",
+        options: {
+          A: "優先快速砍掉獲利差與回收慢的專案，先守住現金流與下一輪融資機會。",
+          B: "對董事會、主管與員工全面說明真實財務狀況，不用漂亮話掩飾可能的艱難決策。",
+          C: "先保核心團隊與關鍵人才，不讓組織在恐慌中失去真正能打仗的人。",
+          D: "立刻重整預算、授權、決策與風險管理流程，避免每次都用臨時救火方式撐過去。"
+        }
+      },
+      {
+        id: 2,
+        title: "大客戶要求灰色操作",
+        scenario: "一個占年度營收 28% 的大客戶暗示，只要你在合約驗收文件上『稍微調整文字』，這張單就能準時認列。財務與業務都希望你不要在此刻失去這張單，但法務提醒這將留下誠信與合規風險。",
+        options: {
+          A: "先保住收入與市場信心，透過可控方式完成認列，避免公司立刻受創。",
+          B: "堅持文件必須反映事實，不接受任何模糊化或掩飾性的作法。",
+          C: "優先保護執行團隊，不讓前線同仁被迫承擔模糊責任或事後究責。",
+          D: "建立明確驗收標準與簽核機制，讓任何高壓客戶都無法繞過制度。 "
+        }
+      },
+      {
+        id: 3,
+        title: "明星主管戰功高但帶人有毒",
+        scenario: "一位業績最強的業務主管持續創造高營收，但其部門離職率極高，內部也累積多起霸凌與羞辱式管理的申訴。董事會對其業績表現高度滿意，你若處理不慎，短期營收很可能下滑。",
+        options: {
+          A: "先保住業績與市場窗口，短期內不輕易動這位主管，改採較溫和的約束方式。",
+          B: "明確表態行為越線就是越線，不因績效好就降低組織底線。",
+          C: "優先修復受傷團隊與流失風險，避免組織把能打仗的人都消耗掉。",
+          D: "重設主管評估、申訴處理與獎懲制度，讓高績效不再成為破壞治理的保護傘。"
+        }
+      },
+      {
+        id: 4,
+        title: "產品安全疑慮與上市時程",
+        scenario: "新產品即將上市，行銷、銷售與通路都已投入大量成本。但測試團隊在最後階段發現一項低機率卻高衝擊的安全疑慮，若延後上市，公司可能錯過年度最大市場窗口。",
+        options: {
+          A: "在風險可控前提下如期上市，先保市場窗口與年度營收目標。",
+          B: "即使代價高，也要對外誠實揭露疑慮並延後上市，不拿模糊風險賭信用。",
+          C: "優先考量第一線客服、業務與使用者承受的後果，不讓人去替組織扛不可預期的傷害。",
+          D: "要求重新啟動風險治理與上市審查流程，讓重大產品決策有更嚴謹的制度門檻。"
+        }
+      },
+      {
+        id: 5,
+        title: "內部檢舉直指創辦人親信",
+        scenario: "你收到匿名檢舉，指出創辦人多年親信在採購上長期存在利益衝突。若往下查，很可能直接引爆高層政治；若不查，組織會更加相信制度只是擺設。",
+        options: {
+          A: "先評估事件對公司融資、品牌與營運穩定的衝擊，避免處理方式讓公司先倒下。",
+          B: "不論對象是誰，都應依事實啟動調查與揭露，維持領導信用與公平底線。",
+          C: "處理過程要兼顧團隊信任與內部安全感，避免讓整個組織陷入猜疑與報復。",
+          D: "讓調查、回避、採購與利害關係揭露制度正式化，不再依賴個人風格與人情。",
+        }
+      },
+      {
+        id: 6,
+        title: "裁員還是全面減薪",
+        scenario: "公司必須在三個月內把人事成本降低 18%。你面前有兩個主方案：一是裁掉 12% 人力保住剩下組織戰力；二是全面減薪，讓大家一起承擔但可能拖長痛苦期。沒有一個方案真正乾淨。",
+        options: {
+          A: "選擇能最快恢復財務體質與戰力的方案，讓公司先活下來再談修復。",
+          B: "把決策依據、數字與選擇標準講清楚，避免用模糊話術掩飾真實取捨。",
+          C: "優先考量對人的長期傷害與團隊信任，不把人當成單純成本欄位。",
+          D: "用一致且可被檢驗的準則處理編制、人力與補償，確保權責清楚與可持續。"
+        }
+      },
+      {
+        id: 7,
+        title: "AI 專案需要大量客戶資料",
+        scenario: "公司準備推出 AI 新服務，若能直接拿既有客戶資料訓練模型，研發時程可大幅縮短並建立領先優勢。但資料使用同意範圍並不完全明確，法遵與資訊安全意見保守。",
+        options: {
+          A: "先搶下產品速度與市場優勢，在風險可承擔範圍內加速推進專案。",
+          B: "資料使用邊界不清就不應硬上，先保真實、透明與對客戶的信用。",
+          C: "優先保護內部團隊與客戶關係，不讓前線同仁去承受日後的不信任與反彈。",
+          D: "先建立資料治理、授權、稽核與模型風險控管機制，再決定如何推進。"
+        }
+      },
+      {
+        id: 8,
+        title: "關鍵主管私下要求特殊待遇",
+        scenario: "一位掌握核心客戶關係的資深主管私下要求更高分潤與更大決策豁免，否則可能帶著團隊離開。你知道若答應，會破壞制度公平；若不答應，短期業績與客戶穩定性都會承受壓力。",
+        options: {
+          A: "先想辦法留住關鍵營收與客戶，必要時接受部分特殊安排。",
+          B: "即使對方功勞很大，也不應為了短期利益破壞公開標準與誠信感。",
+          C: "優先處理對團隊心理安全與公平感的衝擊，不讓組織變成只看誰有籌碼。",
+          D: "透過職級、獎酬與授權制度重整，把例外情況制度化或收斂，不再靠私下談判。"
+        }
+      },
+      {
+        id: 9,
+        title: "公關危機中的真相與節奏",
+        scenario: "公司被媒體點名報導內部管理混亂，社群輿論快速升高。你掌握的資訊還不完整，但若不立即回應，品牌傷害會持續擴大；若說太多，事後又可能因資訊不完整而失信。",
+        options: {
+          A: "先控制市場與媒體風向，採取最有利於品牌與商業損害控制的說法。",
+          B: "寧可承認資訊尚未完整，也要說真話，不用話術把責任與真相遮住。",
+          C: "優先保護內部同仁不被推到第一線當擋箭牌，並兼顧受影響關係人的感受。",
+          D: "建立危機應變流程、發言層級與資訊驗證機制，避免公關反應全靠臨場判斷。"
+        }
+      },
+      {
+        id: 10,
+        title: "跨部門專案失敗需要究責",
+        scenario: "一個高能見度的跨部門轉型專案失敗，董事會要求你盡快說清楚責任。你知道這不是單一人的問題，但若完全不究責，組織會認為失敗沒有成本；若只抓一個人祭旗，又會扭曲真相。",
+        options: {
+          A: "先用最能止血與重建外部信心的方式處理，避免失敗繼續拖累營運。",
+          B: "還原真相、說清楚責任邊界與判斷依據，不用政治方式找替罪羊。",
+          C: "在究責同時保留對人的尊重與修復空間，不把整個團隊推入防衛狀態。",
+          D: "從目標設定、跨部門協作與決策節點檢討治理結構，避免同樣問題反覆發生。"
+        }
+      },
+      {
+        id: 11,
+        title: "海外市場進入與在地灰色文化",
+        scenario: "你正評估進入一個高成長海外市場。當地顧問直言，若完全照總部標準做事，速度會很慢，甚至拿不到關鍵執照；但若接受在地『慣例』，總部法遵與品牌風險將顯著升高。",
+        options: {
+          A: "先抓住市場窗口與成長機會，尋找可操作空間，避免錯過關鍵擴張時點。",
+          B: "不因在地慣例而調低底線，透明與合法仍應是不可交換的原則。",
+          C: "優先考量派駐團隊與在地夥伴未來要承受的壓力，不讓人被置於模糊風險中。",
+          D: "建立跨國授權、法遵審查與風險升級機制，讓海外拓展不再靠個人膽量運作。"
+        }
+      },
+      {
+        id: 12,
+        title: "接班過渡期的權力真空",
+        scenario: "創辦人準備退居幕後，但實際上仍持續越過新任經營團隊下指導棋。高層彼此都在觀望，你若正面處理，可能立刻引發權力對撞；若不處理，組織會陷入雙重指揮與長期內耗。",
+        options: {
+          A: "先確保營運不中斷、業績不失速，避免接班期因權力摩擦直接傷到生意。",
+          B: "誠實面對權責混亂的現況，該講清楚的界線就要講清楚，不能假裝沒事。",
+          C: "優先穩住高層團隊關係與信任，避免整個幹部層在內耗中瓦解。",
+          D: "重新定義治理架構、權限邊界與決策節點，讓接班不再依賴模糊默契。"
+        }
+      }
+    ];
+
+    const DIMENSIONS = {
+      A: {
+        key: "A",
+        name: "結果／資本偏向",
+        short: "結果",
+        color: "#7d90a4",
+        focus: "偏向先保：生存、業績、融資、現金流、股東壓力、市場窗口。",
+        strengths: "優勢：有現實感、敢承擔經營壓力、不容易空談價值。",
+        risks: "風險：容易合理化灰色決策、弱化誠信與公平，團隊可能感到自己只是達標工具。"
+      },
+      B: {
+        key: "B",
+        name: "原則／誠信偏向",
+        short: "原則",
+        color: "#6b7d89",
+        focus: "偏向先保：真實、透明、公平、領導信用、組織底線。",
+        strengths: "優勢：可建立長期信任、邊界感清楚、不容易進入道德滑坡。",
+        risks: "風險：可能低估現實壓力，在生存壓力下顯得過硬，容易被認為正確但不一定能打仗。"
+      },
+      C: {
+        key: "C",
+        name: "人員／團隊偏向",
+        short: "人員",
+        color: "#5e7a70",
+        focus: "偏向先保：關係、忠誠、幹部穩定、士氣、團隊心理安全。",
+        strengths: "優勢：人願意跟、比較能留住核心、不輕易犧牲人。",
+        risks: "風險：容易延後必要決策、對該換的人下不了手，也可能把溫情誤當成熟。"
+      },
+      D: {
+        key: "D",
+        name: "系統／治理偏向",
+        short: "治理",
+        color: "#8d7b4e",
+        focus: "偏向先保：制度、流程、長期秩序、風險控制、權責清楚、可持續性。",
+        strengths: "優勢：組織不必永遠靠英雄撐，比較能做長期治理，對中大型組織尤其重要。",
+        risks: "風險：容易顯得冷，短期不討喜，若缺少節奏感也可能被感受為官僚。"
+      }
+    };
+
+    const STORAGE_KEY = "leader-high-conflict-assessment-v1";
+    const state = {
+      answers: createEmptyAnswers(),
+      lastSavedAt: null
+    };
+
+    let saveIndicatorTimer = null;
+    let eventsBound = false;
+    let questionObserver = null;
+
+    const elements = {
+      questionList: document.getElementById("question-list"),
+      questionNav: document.getElementById("question-nav"),
+      progressNumber: document.getElementById("progress-number"),
+      progressBarFill: document.getElementById("progress-bar-fill"),
+      completionStatus: document.getElementById("completion-status"),
+      sumStatus: document.getElementById("sum-status"),
+      storageStatus: document.getElementById("storage-status"),
+      submitButton: document.getElementById("submit-button"),
+      globalError: document.getElementById("global-error"),
+      resultPanel: document.getElementById("result-panel"),
+      resultSummaryText: document.getElementById("result-summary-text"),
+      summaryGrid: document.getElementById("summary-grid"),
+      resultChart: document.getElementById("result-chart"),
+      resultPrimaryInterpretation: document.getElementById("result-primary-interpretation"),
+      interpretList: document.getElementById("interpret-list"),
+      resultDetails: document.getElementById("result-details"),
+      printButton: document.getElementById("print-button"),
+      exportButton: document.getElementById("export-button"),
+      restartButton: document.getElementById("restart-button"),
+      saveIndicator: document.getElementById("save-indicator"),
+      startButton: document.getElementById("start-button"),
+      jumpResultButton: document.getElementById("jump-result-button")
+    };
+
+    function createEmptyAnswers() {
+      return QUESTIONS.reduce((acc, question) => {
+        acc[question.id] = {
+          scores: { A: 0, B: 0, C: 0, D: 0 },
+          reason: "",
+          cost: "",
+          avoid: ""
+        };
+        return acc;
+      }, {});
+    }
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+
+        const parsed = JSON.parse(saved);
+        if (!parsed || typeof parsed !== "object" || !parsed.answers) return;
+
+        QUESTIONS.forEach((question) => {
+          const incoming = parsed.answers[question.id];
+          if (!incoming) return;
+
+          state.answers[question.id] = {
+            scores: {
+              A: sanitizeScore(incoming.scores?.A),
+              B: sanitizeScore(incoming.scores?.B),
+              C: sanitizeScore(incoming.scores?.C),
+              D: sanitizeScore(incoming.scores?.D)
+            },
+            reason: String(incoming.reason || ""),
+            cost: String(incoming.cost || ""),
+            avoid: ["A", "B", "C", "D"].includes(incoming.avoid) ? incoming.avoid : ""
+          };
+        });
+
+        state.lastSavedAt = parsed.savedAt || null;
+      } catch (error) {
+        console.warn("無法讀取暫存資料：", error);
+      }
+    }
+
+    function saveState(showIndicator = true) {
+      try {
+        const payload = {
+          savedAt: new Date().toISOString(),
+          answers: state.answers
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        state.lastSavedAt = payload.savedAt;
+        updateStorageStatus();
+
+        if (showIndicator) {
+          elements.saveIndicator.classList.add("visible");
+          clearTimeout(saveIndicatorTimer);
+          saveIndicatorTimer = setTimeout(() => {
+            elements.saveIndicator.classList.remove("visible");
+          }, 1800);
+        }
+      } catch (error) {
+        console.warn("無法儲存暫存資料：", error);
+      }
+    }
+
+    function clearState() {
+      localStorage.removeItem(STORAGE_KEY);
+      state.answers = createEmptyAnswers();
+      state.lastSavedAt = null;
+      renderQuestions();
+      QUESTIONS.forEach((question) => syncQuestionUI(question.id));
+      updateProgress();
+      elements.resultPanel.classList.remove("visible");
+      elements.globalError.classList.remove("visible");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function sanitizeScore(value) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return 0;
+      return Math.max(0, Math.min(10, Math.round(number)));
+    }
+
+    function getQuestionAnswer(questionId) {
+      return state.answers[questionId];
+    }
+
+    function getQuestionSum(questionId) {
+      const answer = getQuestionAnswer(questionId);
+      return ["A", "B", "C", "D"].reduce((sum, key) => sum + sanitizeScore(answer.scores[key]), 0);
+    }
+
+    function isQuestionComplete(questionId) {
+      const answer = getQuestionAnswer(questionId);
+      return (
+        getQuestionSum(questionId) === 10 &&
+        answer.reason.trim() &&
+        answer.cost.trim() &&
+        answer.avoid
+      );
+    }
+
+    function getQuestionErrors(questionId) {
+      const answer = getQuestionAnswer(questionId);
+      const errors = [];
+      if (getQuestionSum(questionId) !== 10) errors.push("分數加總需等於 10 分");
+      if (!answer.reason.trim()) errors.push("尚未填寫核心理由");
+      if (!answer.cost.trim()) errors.push("尚未填寫願意承擔的代價");
+      if (!answer.avoid) errors.push("尚未選擇最不願意選的方向");
+      return errors;
+    }
+
+    function buildQuestionCard(question) {
+      const answer = getQuestionAnswer(question.id);
+      const sum = getQuestionSum(question.id);
+      const completed = isQuestionComplete(question.id);
+
+      const card = document.createElement("article");
+      card.className = "question-card";
+      card.id = `question-${question.id}`;
+
+      card.innerHTML = `
+        <div class="question-top">
+          <div>
+            <div class="question-number">題目 ${question.id}</div>
+            <h2 class="question-title">${question.title}</h2>
+            <p class="question-scenario">${question.scenario}</p>
+          </div>
+          <div class="question-sum ${sum === 10 ? "" : "invalid"}" data-role="sum-box">
+            本題總分：<span data-role="sum-value">${sum}</span> / 10
+          </div>
+        </div>
+
+        <div class="option-grid">
+          ${["A", "B", "C", "D"].map((key) => `
+            <div class="option-card">
+              <div class="option-head">
+                <div class="option-label">
+                  <span class="option-pill">${key}</span>
+                  <span>${DIMENSIONS[key].name}</span>
+                </div>
+                <input
+                  class="score-input"
+                  data-question-id="${question.id}"
+                  data-score-key="${key}"
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  max="10"
+                  step="1"
+                  value="${answer.scores[key]}"
+                  aria-label="第 ${question.id} 題 ${key} 選項分數"
+                >
+              </div>
+              <p>${question.options[key]}</p>
+            </div>
+          `).join("")}
+        </div>
+
+        <div class="question-warning ${sum === 10 ? "" : "visible"}" data-role="sum-warning">
+          本題目前總分為 ${sum} 分，請調整至 10 分後才能完成本題。
+        </div>
+
+        <div class="meta-grid">
+          <div class="field-group">
+            <label for="reason-${question.id}">核心理由</label>
+            <textarea id="reason-${question.id}" data-question-id="${question.id}" data-text-field="reason" placeholder="請說明你為什麼在此刻先保這些方向。">${escapeHtml(answer.reason)}</textarea>
+          </div>
+          <div class="field-group">
+            <label for="cost-${question.id}">願意承擔的代價</label>
+            <textarea id="cost-${question.id}" data-question-id="${question.id}" data-text-field="cost" placeholder="請寫下你願意承擔哪些後果，而不是只寫你的立場。">${escapeHtml(answer.cost)}</textarea>
+          </div>
+        </div>
+
+        <div class="field-group" style="margin-top: 18px;">
+          <label>最不願意選的方向</label>
+          <div class="radio-group" data-question-id="${question.id}">
+            ${["A", "B", "C", "D"].map((key) => `
+              <label class="radio-card ${answer.avoid === key ? "selected" : ""}">
+                <input type="radio" name="avoid-${question.id}" value="${key}" data-question-id="${question.id}" data-avoid-radio ${answer.avoid === key ? "checked" : ""}>
+                <span>${key}｜${DIMENSIONS[key].short}</span>
+              </label>
+            `).join("")}
+          </div>
+        </div>
+
+        <div class="question-warning ${completed ? "" : "visible"}" data-role="completion-warning">
+          ${completed ? "" : "本題尚未完成：請確認總分、理由、代價與最不願意選的方向皆已填妥。"}
+        </div>
+      `;
+
+      return card;
+    }
+
+    function buildNavButton(question) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "nav-link";
+      button.dataset.questionId = question.id;
+      button.textContent = question.id;
+      button.addEventListener("click", () => {
+        document.getElementById(`question-${question.id}`).scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      return button;
+    }
+
+    function renderQuestions() {
+      elements.questionList.innerHTML = "";
+      elements.questionNav.innerHTML = "";
+
+      QUESTIONS.forEach((question) => {
+        elements.questionList.appendChild(buildQuestionCard(question));
+        elements.questionNav.appendChild(buildNavButton(question));
+      });
+    }
+
+    function attachEvents() {
+      if (eventsBound) return;
+      eventsBound = true;
+
+      elements.questionList.addEventListener("input", (event) => {
+        const target = event.target;
+        if (target.matches("[data-score-key]")) {
+          const questionId = Number(target.dataset.questionId);
+          const key = target.dataset.scoreKey;
+          const value = sanitizeScore(target.value);
+          target.value = value;
+          state.answers[questionId].scores[key] = value;
+          syncQuestionUI(questionId);
+          saveState();
+        }
+
+        if (target.matches("[data-text-field]")) {
+          const questionId = Number(target.dataset.questionId);
+          const field = target.dataset.textField;
+          state.answers[questionId][field] = target.value;
+          syncQuestionUI(questionId);
+          saveState();
+        }
+      });
+
+      elements.questionList.addEventListener("change", (event) => {
+        const target = event.target;
+        if (target.matches("[data-avoid-radio]")) {
+          const questionId = Number(target.dataset.questionId);
+          state.answers[questionId].avoid = target.value;
+          syncQuestionUI(questionId);
+          saveState();
+        }
+      });
+
+      elements.submitButton.addEventListener("click", handleSubmit);
+      elements.printButton.addEventListener("click", () => window.print());
+      elements.exportButton.addEventListener("click", exportJson);
+      elements.restartButton.addEventListener("click", () => {
+        if (window.confirm("確定要清除目前作答內容並重新作答嗎？")) {
+          clearState();
+        }
+      });
+      elements.startButton.addEventListener("click", () => {
+        document.getElementById("assessment-layout").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      elements.jumpResultButton.addEventListener("click", () => {
+        document.getElementById("result-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      // 依滾動位置更新側邊導覽高亮。
+      questionObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const questionId = entry.target.id.replace("question-", "");
+          document.querySelectorAll(".nav-link").forEach((button) => {
+            button.classList.toggle("active", button.dataset.questionId === questionId);
+          });
+        });
+      }, { rootMargin: "-40% 0px -45% 0px", threshold: 0.1 });
+
+      observeQuestionCards();
+    }
+
+    function observeQuestionCards() {
+      if (!questionObserver) return;
+      document.querySelectorAll(".question-card").forEach((card) => questionObserver.observe(card));
+    }
+
+    function syncQuestionUI(questionId) {
+      const answer = getQuestionAnswer(questionId);
+      const card = document.getElementById(`question-${questionId}`);
+      if (!card) return;
+
+      const sum = getQuestionSum(questionId);
+      const completed = isQuestionComplete(questionId);
+      const sumBox = card.querySelector("[data-role='sum-box']");
+      const sumValue = card.querySelector("[data-role='sum-value']");
+      const sumWarning = card.querySelector("[data-role='sum-warning']");
+      const completionWarning = card.querySelector("[data-role='completion-warning']");
+
+      sumValue.textContent = String(sum);
+      sumBox.classList.toggle("invalid", sum !== 10);
+      sumWarning.classList.toggle("visible", sum !== 10);
+      sumWarning.textContent = `本題目前總分為 ${sum} 分，請調整至 10 分後才能完成本題。`;
+
+      const errors = getQuestionErrors(questionId);
+      completionWarning.classList.toggle("visible", !completed);
+      completionWarning.textContent = completed ? "" : `本題尚未完成：${errors.join("、")}。`;
+
+      card.querySelectorAll(".radio-card").forEach((label) => {
+        const input = label.querySelector("input");
+        label.classList.toggle("selected", input.checked);
+      });
+
+      const navButton = elements.questionNav.querySelector(`[data-question-id="${questionId}"]`);
+      if (navButton) {
+        navButton.style.background = completed ? "rgba(53, 94, 78, 0.12)" : "";
+        navButton.style.color = completed ? "var(--success)" : "";
+        navButton.style.borderColor = completed ? "rgba(53, 94, 78, 0.22)" : "";
+      }
+
+      updateProgress();
+    }
+
+    function updateStorageStatus() {
+      if (!state.lastSavedAt) {
+        elements.storageStatus.textContent = "本機暫存：尚未儲存";
+        elements.storageStatus.className = "status-badge";
+        return;
+      }
+      const timeText = new Date(state.lastSavedAt).toLocaleString("zh-Hant", {
+        hour12: false
+      });
+      elements.storageStatus.textContent = `本機暫存：${timeText}`;
+      elements.storageStatus.className = "status-badge success";
+    }
+
+    function updateProgress() {
+      const completedCount = QUESTIONS.filter((question) => isQuestionComplete(question.id)).length;
+      const invalidSumCount = QUESTIONS.filter((question) => getQuestionSum(question.id) !== 10).length;
+      const unfinishedCount = QUESTIONS.length - completedCount;
+      const progressRate = (completedCount / QUESTIONS.length) * 100;
+
+      elements.progressNumber.textContent = `${completedCount} / ${QUESTIONS.length}`;
+      elements.progressBarFill.style.width = `${progressRate}%`;
+
+      elements.completionStatus.textContent = unfinishedCount === 0
+        ? "所有題目已完成"
+        : `尚有 ${unfinishedCount} 題未完成`;
+      elements.completionStatus.className = `status-badge ${unfinishedCount === 0 ? "success" : "warning"}`;
+
+      elements.sumStatus.textContent = invalidSumCount === 0
+        ? "所有題目分數加總皆為 10"
+        : `仍有 ${invalidSumCount} 題分數總和不等於 10`;
+      elements.sumStatus.className = `status-badge ${invalidSumCount === 0 ? "success" : "warning"}`;
+
+      updateStorageStatus();
+    }
+
+    function validateAllQuestions() {
+      const errors = QUESTIONS.map((question) => ({
+        id: question.id,
+        errors: getQuestionErrors(question.id)
+      })).filter((item) => item.errors.length > 0);
+
+      if (errors.length === 0) {
+        elements.globalError.classList.remove("visible");
+        elements.globalError.innerHTML = "";
+        return [];
+      }
+
+      elements.globalError.classList.add("visible");
+      elements.globalError.innerHTML = `
+        <strong>仍有題目未完成，請先修正以下內容：</strong>
+        <ul>
+          ${errors.map((item) => `<li>第 ${item.id} 題：${item.errors.join("、")}</li>`).join("")}
+        </ul>
+      `;
+      return errors;
+    }
+
+    function calculateResults() {
+      const totals = { A: 0, B: 0, C: 0, D: 0 };
+      QUESTIONS.forEach((question) => {
+        const answer = getQuestionAnswer(question.id);
+        ["A", "B", "C", "D"].forEach((key) => {
+          totals[key] += sanitizeScore(answer.scores[key]);
+        });
+      });
+
+      const ranked = Object.keys(totals)
+        .map((key) => ({ key, total: totals[key], meta: DIMENSIONS[key] }))
+        .sort((left, right) => right.total - left.total);
+
+      return { totals, ranked };
+    }
+
+    function getBlendInsight(topKey, secondKey) {
+      const pair = `${topKey}${secondKey}`;
+      const insights = {
+        AB: "你在高衝突中常以生存壓力與原則底線同步思考，偏向在現實與信用之間找可承受的硬邊界。",
+        AC: "你傾向先保戰力與人心，代表你在現實壓力下仍把可持續作戰的人放在核心位置。",
+        AD: "你偏好先穩住生意與治理框架，較容易從經營現實與制度秩序兩端下判斷。",
+        BA: "你重視真實與底線，同時也不否認經營壓力，通常會先問：可不可以在不越線下活下來。",
+        BC: "你把誠信與關係放得很前面，會特別在意領導信用是否建立在對人的尊重之上。",
+        BD: "你偏向用底線與治理去承接衝突，較適合處理需要長期信任與清楚權責的情境。",
+        CA: "你重視團隊能否跟得住，同時也能面對現實壓力，常把戰力穩定視為生存的一部分。",
+        CB: "你傾向在關係與原則間維持一致，通常不希望靠犧牲人或說模糊話來完成領導任務。",
+        CD: "你重視團隊感受，也相信健康組織需要制度承接，不希望一切只靠好人或英雄。",
+        DA: "你常從制度與經營後果思考，傾向建立可以長期運轉而非只靠臨場補洞的解法。",
+        DB: "你偏向由治理與原則出發看待衝突，代表你在長期秩序與信任上有較高敏感度。",
+        DC: "你想保護秩序，也在意人如何被制度對待，通常會關注公平、清楚與心理安全是否能同時成立。"
+      };
+      return insights[pair] || "你的前兩高向度顯示，你在壓力下不是只看單一價值，而是會用兩種框架同時判斷。";
+    }
+
+    function renderResults() {
+      const { totals, ranked } = calculateResults();
+      const [top, second, lowest] = [ranked[0], ranked[1], ranked[ranked.length - 1]];
+      const maxScore = Math.max(...ranked.map((item) => item.total), 1);
+      const allAverageLike = QUESTIONS.every((question) => {
+        const scores = Object.values(getQuestionAnswer(question.id).scores);
+        return Math.max(...scores) - Math.min(...scores) <= 1;
+      });
+
+      elements.summaryGrid.innerHTML = ranked.map((item) => `
+        <article class="summary-card">
+          <div class="tag">${item.key}｜${item.meta.short}</div>
+          <strong>${item.total}</strong>
+          <p>${item.meta.name}</p>
+        </article>
+      `).join("");
+
+      elements.resultChart.innerHTML = ranked.map((item) => `
+        <div class="chart-row">
+          <div class="chart-label">${item.key}｜${item.meta.name}</div>
+          <div class="chart-track">
+            <div class="chart-bar" style="width: ${(item.total / maxScore) * 100}%; background: linear-gradient(90deg, ${item.meta.color}, #8d7b4e);"></div>
+          </div>
+          <strong>${item.total}</strong>
+        </div>
+      `).join("");
+
+      elements.resultSummaryText.textContent =
+        `你的最高分向度是 ${top.key}（${top.meta.name}），第二高為 ${second.key}（${second.meta.name}），最低分向度為 ${lowest.key}（${lowest.meta.name}）。`;
+
+      elements.resultPrimaryInterpretation.textContent =
+        `整體來看，你在高衝突情境中最優先保護的是「${top.meta.name}」，其次是「${second.meta.name}」。相對而言，你較少直覺地從「${lowest.meta.name}」出發。這不代表你不重視它，而是表示在高壓、無法兼顧的時刻，它通常不是你第一順位會先守住的東西。`;
+
+      const interpretItems = [
+        top.meta.focus,
+        top.meta.strengths,
+        top.meta.risks,
+        second.meta.focus,
+        second.meta.strengths,
+        second.meta.risks,
+        lowest.meta.risks,
+        getBlendInsight(top.key, second.key),
+        allAverageLike
+          ? "你的分配在多數題目上相當平均，這可能代表你仍傾向維持兼顧感，而不是做出明確取捨。若此結果用於教練或發展討論，建議回到題目重新辨識你真正最怕失去的是什麼。"
+          : "你的作答分布有做出明顯取捨，這通常更能反映你在高壓決策下的真實優先順序。"
+      ];
+
+      elements.interpretList.innerHTML = interpretItems.map((item) => `<li>${item}</li>`).join("");
+      renderResultDetails();
+      elements.resultPanel.classList.add("visible");
+      elements.resultPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function renderResultDetails() {
+      elements.resultDetails.innerHTML = QUESTIONS.map((question) => {
+        const answer = getQuestionAnswer(question.id);
+        return `
+          <details>
+            <summary>第 ${question.id} 題｜${question.title}</summary>
+            <div class="detail-content">
+              <div class="detail-score-grid">
+                <span>A：${answer.scores.A}</span>
+                <span>B：${answer.scores.B}</span>
+                <span>C：${answer.scores.C}</span>
+                <span>D：${answer.scores.D}</span>
+              </div>
+              <p><strong>核心理由：</strong>${escapeHtml(answer.reason).replace(/\n/g, "<br>")}</p>
+              <p><strong>願意承擔的代價：</strong>${escapeHtml(answer.cost).replace(/\n/g, "<br>")}</p>
+              <p><strong>最不願意選的方向：</strong>${answer.avoid || "未填寫"}</p>
+            </div>
+          </details>
+        `;
+      }).join("");
+    }
+
+    function exportJson() {
+      const results = calculateResults();
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        totals: results.totals,
+        ranked: results.ranked.map((item) => ({
+          key: item.key,
+          name: item.meta.name,
+          total: item.total
+        })),
+        answers: state.answers
+      };
+
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "leader-high-conflict-assessment-result.json";
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function handleSubmit() {
+      const errors = validateAllQuestions();
+      if (errors.length > 0) {
+        const firstErrorCard = document.getElementById(`question-${errors[0].id}`);
+        if (firstErrorCard) {
+          firstErrorCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        return;
+      }
+
+      saveState(false);
+      renderResults();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function renderAll() {
+      renderQuestions();
+      attachEvents();
+      observeQuestionCards();
+      QUESTIONS.forEach((question) => syncQuestionUI(question.id));
+      updateProgress();
+    }
+
+    loadState();
+    renderAll();
+  </script>
+</body>
+</html>

@@ -1487,6 +1487,7 @@
 
     function observeQuestionCards() {
       if (!questionObserver) return;
+      questionObserver.disconnect();
       document.querySelectorAll(".question-card").forEach((card) => questionObserver.observe(card));
     }
 

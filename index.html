@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>領導者高衝突評鑑題本</title>
+<style>
+/* ===== 基礎重置與全域樣式 ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #2c3e50;
+  --primary-dark: #1a252f;
+  --primary-light: #3d566e;
+  --accent: #b8943e;
+  --accent-light: #d4b86a;
+  --bg: #f5f3ef;
+  --bg-card: #ffffff;
+  --bg-section: #eae7e1;
+  --text: #2c3e50;
+  --text-light: #5a6d7e;
+  --text-muted: #8899a6;
+  --border: #d5d0c8;
+  --border-light: #e8e4dd;
+  --error: #c0392b;
+  --error-bg: #fdf0ef;
+  --success: #27ae60;
+  --success-bg: #eef9f3;
+  --shadow: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-lg: 0 4px 20px rgba(0,0,0,0.1);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", -apple-system, sans-serif;
+  --transition: 0.25s ease;
+}
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== 排版工具 ===== */
+.container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+h1, h2, h3, h4 { font-weight: 600; line-height: 1.3; }
+
+/* ===== 導覽列 ===== */
+.navbar {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--primary-dark);
+  color: #fff;
+  padding: 0 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+
+.navbar-inner {
+  max-width: 860px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px;
+}
+
+.navbar-title {
+  font-size: 1rem; font-weight: 600; letter-spacing: 0.5px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.navbar-progress {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 0.85rem; color: rgba(255,255,255,0.8);
+}
+
+.progress-bar-outer {
+  width: 120px; height: 6px;
+  background: rgba(255,255,255,0.15); border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-inner {
+  height: 100%; background: var(--accent);
+  border-radius: 3px; transition: width var(--transition);
+}
+
+.navbar-nav {
+  display: none;
+  position: absolute; top: 56px; left: 0; right: 0;
+  background: var(--primary-dark);
+  max-height: 60vh; overflow-y: auto;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: var(--shadow-lg);
+}
+
+.navbar-nav.open { display: block; }
+
+.navbar-nav a {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 24px; color: rgba(255,255,255,0.85);
+  text-decoration: none; font-size: 0.88rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background var(--transition);
+}
+
+.navbar-nav a:hover { background: rgba(255,255,255,0.08); }
+.navbar-nav a .nav-status { font-size: 0.75rem; }
+.navbar-nav a .nav-status.done { color: var(--success); }
+.navbar-nav a .nav-status.incomplete { color: var(--error); }
+.navbar-nav a .nav-status.pending { color: var(--text-muted); }
+
+.btn-nav-toggle {
+  background: none; border: 1px solid rgba(255,255,255,0.3);
+  color: #fff; padding: 6px 12px; border-radius: 4px;
+  cursor: pointer; font-size: 0.8rem; transition: all var(--transition);
+}
+
+.btn-nav-toggle:hover { background: rgba(255,255,255,0.1); }
+
+/* ===== 封面區塊 ===== */
+.hero {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(145deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+  color: #fff; text-align: center; padding: 40px 24px;
+}
+
+.hero-content { max-width: 640px; }
+
+.hero h1 {
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  font-weight: 700; letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+
+.hero .subtitle {
+  font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 32px; line-height: 1.8;
+}
+
+.hero .intro {
+  font-size: 0.92rem; color: rgba(255,255,255,0.6);
+  margin-bottom: 48px; line-height: 1.9;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  padding-top: 24px;
+}
+
+.btn-primary {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff; padding: 14px 48px;
+  border: none; border-radius: var(--radius);
+  font-size: 1.05rem; font-weight: 600;
+  cursor: pointer; transition: all var(--transition);
+  letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+  background: var(--accent-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(184,148,62,0.35);
+}
+
+/* ===== 說明區塊 ===== */
+.instructions {
+  background: var(--bg-section);
+  padding: 64px 24px;
+}
+
+.instructions-inner { max-width: 720px; margin: 0 auto; }
+
+.instructions h2 {
+  font-size: 1.5rem; margin-bottom: 32px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--accent);
+  display: inline-block;
+}
+
+.rule-list { list-style: none; counter-reset: rule; }
+
+.rule-list li {
+  counter-increment: rule;
+  padding: 16px 0 16px 48px;
+  position: relative; border-bottom: 1px solid var(--border-light);
+  font-size: 0.95rem;
+}
+
+.rule-list li::before {
+  content: counter(rule);
+  position: absolute; left: 0; top: 16px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--primary);
+  color: #fff; font-size: 0.85rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.note-box {
+  margin-top: 32px; padding: 20px 24px;
+  background: var(--bg-card);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 0.92rem; color: var(--text-light);
+}
+
+/* ===== 題目卡片 ===== */
+.questions-section { padding: 48px 0 80px; }
+
+.question-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  margin-bottom: 32px;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  transition: box-shadow var(--transition);
+}
+
+.question-card:hover { box-shadow: var(--shadow-lg); }
+
+.question-header {
+  background: var(--primary);
+  color: #fff; padding: 20px 28px;
+  display: flex; align-items: center; gap: 16px;
+}
+
+.question-number {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.1rem; flex-shrink: 0;
+}
+
+.question-title { font-size: 1.05rem; font-weight: 600; }
+
+.question-scenario {
+  padding: 24px 28px;
+  background: var(--bg-section);
+  font-size: 0.93rem; line-height: 1.9;
+  color: var(--text-light);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.question-body { padding: 28px; }
+
+/* 選項分數區 */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px; margin-bottom: 20px;
+}
+
+.option-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+  transition: border-color var(--transition);
+}
+
+.option-row:hover { border-color: var(--border); }
+
+.option-label {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.95rem; flex-shrink: 0;
+  color: #fff;
+}
+
+.option-label-A { background: #4a6fa5; }
+.option-label-B { background: #6b8e5a; }
+.option-label-C { background: #b5854b; }
+.option-label-D { background: #7a6b8e; }
+
+.option-text { flex: 1; font-size: 0.9rem; line-height: 1.6; padding-top: 6px; }
+
+.option-score {
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+}
+
+.option-score input {
+  width: 56px; height: 40px;
+  text-align: center; font-size: 1.1rem; font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text);
+  transition: border-color var(--transition);
+  font-family: var(--font);
+}
+
+.option-score input:focus {
+  outline: none; border-color: var(--accent);
+}
+
+.option-score span { font-size: 0.8rem; color: var(--text-muted); }
+
+/* 分數總和顯示 */
+.score-summary {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--success-bg);
+  border: 1px solid var(--success);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  font-weight: 600;
+  transition: all var(--transition);
+}
+
+.score-summary.error {
+  background: var(--error-bg);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.score-summary.ok { color: var(--success); }
+
+/* 額外欄位 */
+.extra-fields { border-top: 1px solid var(--border-light); padding-top: 24px; }
+
+.field-group { margin-bottom: 20px; }
+
+.field-group label {
+  display: block; font-size: 0.88rem; font-weight: 600;
+  margin-bottom: 8px; color: var(--primary);
+}
+
+.field-group textarea {
+  width: 100%; min-height: 80px; padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 0.9rem; line-height: 1.7;
+  resize: vertical; transition: border-color var(--transition);
+  background: var(--bg);
+}
+
+.field-group textarea:focus {
+  outline: none; border-color: var(--accent);
+}
+
+/* 最不願意選的方向 radio */
+.least-preferred { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.radio-option {
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all var(--transition);
+  font-size: 0.9rem;
+}
+
+.radio-option:hover { border-color: var(--primary); background: var(--bg-section); }
+
+.radio-option input[type="radio"] {
+  accent-color: var(--primary);
+  width: 16px; height: 16px;
+}
+
+.radio-option.selected {
+  border-color: var(--primary);
+  background: rgba(44,62,80,0.06);
+}
+
+/* ===== 提交區 ===== */
+.submit-section {
+  text-align: center; padding: 40px 24px 80px;
+}
+
+.validation-summary {
+  max-width: 640px; margin: 0 auto 32px;
+  text-align: left;
+}
+
+.validation-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; font-size: 0.9rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.validation-item .vi-icon { font-size: 1rem; flex-shrink: 0; }
+.validation-item.pass .vi-icon { color: var(--success); }
+.validation-item.fail .vi-icon { color: var(--error); }
+
+.btn-submit {
+  background: var(--primary);
+  color: #fff; padding: 16px 56px;
+  border: none; border-radius: var(--radius);
+  font-size: 1.1rem; font-weight: 600;
+  cursor: pointer; transition: all var(--transition);
+  letter-spacing: 1px;
+}
+
+.btn-submit:hover {
+  background: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(44,62,80,0.3);
+}
+
+.btn-submit:disabled {
+  opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none;
+}
+
+/* ===== 結果頁 ===== */
+.result-section {
+  display: none;
+  padding: 48px 0 80px;
+}
+
+.result-header {
+  text-align: center; padding: 48px 24px;
+  background: linear-gradient(145deg, var(--primary-dark), var(--primary));
+  color: #fff; border-radius: var(--radius-lg);
+  margin-bottom: 40px;
+}
+
+.result-header h2 { font-size: 1.8rem; margin-bottom: 8px; }
+.result-header p { color: rgba(255,255,255,0.7); font-size: 0.95rem; }
+
+/* 長條圖 */
+.chart-container {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow);
+  margin-bottom: 32px;
+  border: 1px solid var(--border-light);
+}
+
+.chart-container h3 {
+  font-size: 1.15rem; margin-bottom: 28px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.bar-chart { display: flex; flex-direction: column; gap: 20px; }
+
+.bar-row {
+  display: flex; align-items: center; gap: 16px;
+}
+
+.bar-label {
+  width: 140px; flex-shrink: 0;
+  font-size: 0.88rem; font-weight: 600;
+  text-align: right;
+}
+
+.bar-track {
+  flex: 1; height: 36px;
+  background: var(--bg-section);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex; align-items: center;
+  padding: 0 12px;
+  font-size: 0.85rem; font-weight: 700;
+  color: #fff;
+  min-width: 40px;
+}
+
+.bar-fill-A { background: linear-gradient(90deg, #4a6fa5, #5d8abf); }
+.bar-fill-B { background: linear-gradient(90deg, #6b8e5a, #82a86f); }
+.bar-fill-C { background: linear-gradient(90deg, #b5854b, #c99e64); }
+.bar-fill-D { background: linear-gradient(90deg, #7a6b8e, #9585a8); }
+
+.bar-value {
+  width: 48px; flex-shrink: 0;
+  font-size: 1.1rem; font-weight: 700;
+  text-align: center;
+}
+
+/* 排名摘要 */
+.rank-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px; margin-bottom: 32px;
+}
+
+.rank-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-light);
+}
+
+.rank-card.highest { border-top: 4px solid var(--accent); }
+.rank-card.second { border-top: 4px solid var(--primary-light); }
+.rank-card.lowest { border-top: 4px solid var(--text-muted); }
+
+.rank-card .rank-label {
+  font-size: 0.8rem; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.rank-card .rank-dim {
+  font-size: 1.2rem; font-weight: 700; margin-bottom: 4px;
+}
+
+.rank-card .rank-score {
+  font-size: 0.95rem; color: var(--text-light);
+}
+
+/* 解讀區塊 */
+.interpretation-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-light);
+}
+
+.interpretation-card h3 {
+  font-size: 1.15rem; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+
+.interp-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 50%;
+  color: #fff; font-weight: 700; font-size: 0.9rem;
+}
+
+.interp-section { margin-bottom: 16px; }
+
+.interp-section h4 {
+  font-size: 0.92rem; font-weight: 600;
+  color: var(--text-light); margin-bottom: 8px;
+}
+
+.interp-section ul {
+  list-style: disc; padding-left: 20px;
+  font-size: 0.9rem; line-height: 1.8;
+  color: var(--text-light);
+}
+
+/* 成熟度說明 */
+.maturity-note {
+  background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+  color: #fff; border-radius: var(--radius-lg);
+  padding: 32px; margin: 40px 0;
+}
+
+.maturity-note h3 { font-size: 1.15rem; margin-bottom: 20px; color: var(--accent-light); }
+
+.maturity-note ol {
+  padding-left: 24px; font-size: 0.92rem;
+  line-height: 2; color: rgba(255,255,255,0.85);
+}
+
+/* 每題摘要 */
+.detail-toggle {
+  background: none; border: 1px solid var(--border);
+  padding: 10px 24px; border-radius: var(--radius);
+  cursor: pointer; font-size: 0.9rem; font-family: var(--font);
+  color: var(--text); transition: all var(--transition);
+  margin-bottom: 16px;
+}
+
+.detail-toggle:hover { border-color: var(--primary); background: var(--bg-section); }
+
+.detail-panel {
+  display: none; margin-bottom: 32px;
+}
+
+.detail-panel.open { display: block; }
+
+.detail-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 12px;
+}
+
+.detail-item h4 { font-size: 0.95rem; margin-bottom: 12px; color: var(--primary); }
+
+.detail-scores {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.detail-score-chip {
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 0.82rem; font-weight: 600;
+}
+
+.detail-meta { font-size: 0.85rem; color: var(--text-light); line-height: 1.8; }
+.detail-meta strong { color: var(--text); }
+
+/* 操作按鈕列 */
+.result-actions {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.btn-action {
+  padding: 12px 28px; border-radius: var(--radius);
+  font-size: 0.92rem; font-weight: 600;
+  cursor: pointer; transition: all var(--transition);
+  border: none; font-family: var(--font);
+}
+
+.btn-action.print {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-action.export {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-action.restart {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn-action:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+
+/* ===== 隱藏與顯示 ===== */
+.hidden { display: none !important; }
+
+/* ===== 列印樣式 ===== */
+@media print {
+  .navbar, .btn-action, .detail-toggle { display: none !important; }
+  .result-section { display: block !important; }
+  body { background: #fff; }
+  .result-header { break-after: avoid; }
+}
+
+/* ===== RWD ===== */
+@media (max-width: 640px) {
+  .container { padding: 0 16px; }
+  .question-header { padding: 16px 20px; flex-direction: column; text-align: center; gap: 8px; }
+  .question-scenario { padding: 16px 20px; }
+  .question-body { padding: 20px; }
+  .option-row { flex-direction: column; gap: 8px; padding: 12px; }
+  .option-score { align-self: flex-end; }
+  .bar-label { width: 100px; font-size: 0.8rem; }
+  .bar-row { gap: 8px; }
+  .rank-summary { grid-template-columns: 1fr; }
+  .navbar-title { font-size: 0.85rem; }
+  .progress-bar-outer { width: 80px; }
+  .hero h1 { font-size: 1.6rem; }
+  .result-actions { flex-direction: column; align-items: center; }
+  .btn-action { width: 100%; max-width: 280px; }
+}
+
+/* ===== 捲動提示動畫 ===== */
+@keyframes highlight-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,0); }
+  50% { box-shadow: 0 0 0 6px rgba(192,57,43,0.2); }
+}
+
+.question-card.highlight {
+  animation: highlight-pulse 1s ease 2;
+  border-color: var(--error);
+}
+</style>
+</head>
+<body>
+
+<!-- ===== 導覽列 ===== -->
+<nav class="navbar hidden" id="navbar">
+  <div class="navbar-inner">
+    <span class="navbar-title">領導者高衝突評鑑題本</span>
+    <div class="navbar-progress">
+      <span id="progressText">0 / 12</span>
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="progressBar" style="width:0%"></div>
+      </div>
+      <button class="btn-nav-toggle" id="btnNavToggle" aria-label="題目導覽">導覽 ▾</button>
+    </div>
+  </div>
+  <div class="navbar-nav" id="navPanel"></div>
+</nav>
+
+<!-- ===== 封面 ===== -->
+<section class="hero" id="heroSection">
+  <div class="hero-content">
+    <h1>領導者高衝突評鑑題本</h1>
+    <p class="subtitle">在高衝突、多重壓力與無標準答案的情境中，<br>看見你真正優先保護的是什麼</p>
+    <p class="intro">
+      這不是一份對錯測驗。<br>
+      這裡沒有標準答案，只有取捨與代價。<br>
+      每一道題目都會把你放進一個無法兼顧所有面向的情境中，<br>
+      迫使你做出優先排序——你願意先保住什麼？願意先放掉什麼？<br>
+      請依照你的真實偏好作答，而不是填寫你認為的理想答案。
+    </p>
+    <button class="btn-primary" id="btnStart">開始作答</button>
+  </div>
+</section>
+
+<!-- ===== 說明區 ===== -->
+<section class="instructions hidden" id="instructionsSection">
+  <div class="instructions-inner">
+    <h2>作答說明</h2>
+    <ol class="rule-list">
+      <li>每題包含四個選項（A／B／C／D），分別代表四種不同的領導取向。</li>
+      <li>請將 <strong>10 分</strong>分配給 A、B、C、D 四個選項，四項加總必須等於 10 分。</li>
+      <li>分數代表你在該情境中對該取向的優先程度，分數愈高代表愈優先。</li>
+      <li>每題作答完畢後，請填寫「<strong>核心理由</strong>」——說明你為何如此分配。</li>
+      <li>請填寫「<strong>願意承擔的代價</strong>」——承認這個選擇可能帶來的犧牲。</li>
+      <li>請勾選「<strong>最不願意選的方向</strong>」——你最難割捨但仍然選擇放下的選項。</li>
+      <li>沒有標準答案，請依照真實偏好作答，而不是填理想答案。</li>
+    </ol>
+    <div class="note-box">
+      <strong>提醒：</strong>成熟的領導者不會每題都平均分配，也不會把自己描述成永遠兼顧一切的人。
+      誠實面對自己的優先序，才能看見真正的領導模式。
+    </div>
+  </div>
+</section>
+
+<!-- ===== 題目區 ===== -->
+<section class="questions-section hidden" id="questionsSection">
+  <div class="container" id="questionsContainer"></div>
+</section>
+
+<!-- ===== 提交區 ===== -->
+<section class="submit-section hidden" id="submitSection">
+  <div class="validation-summary" id="validationSummary"></div>
+  <button class="btn-submit" id="btnSubmit">提交作答結果</button>
+</section>
+
+<!-- ===== 結果頁 ===== -->
+<section class="result-section" id="resultSection">
+  <div class="container" id="resultContainer"></div>
+</section>
+
+<script>
+/* ===== 題目資料 ===== */
+const QUESTIONS = [
+  {
+    id: 1,
+    title: "客戶資料外洩的應對取捨",
+    scenario: "你是一家中型科技公司的總經理。一位核心工程主管在內部系統中發現嚴重漏洞，已有少量客戶資料外洩。此時公司正處於 B 輪融資的最後階段，你已知若此事曝光，融資極可能破局。你的法務建議先靜觀其變、補好漏洞即可；資安主管則強烈建議立刻通報主管機關並告知客戶。團隊內部也擔心此事若公開，對士氣和信任的衝擊難以估計。",
+    options: {
+      A: "壓住消息、先完成融資，確保公司生存後再處理善後。",
+      B: "立即主動通報主管機關與受影響客戶，接受融資可能中斷的後果。",
+      C: "先安撫內部團隊情緒，確保核心成員不流失，再決定對外策略。",
+      D: "先啟動完整的資安應變 SOP、修復漏洞、建立紀錄，按制度判斷是否需要通報。"
+    }
+  },
+  {
+    id: 2,
+    title: "高績效主管的職場霸凌指控",
+    scenario: "你的事業部最強的業務總監被三位部屬聯名指控長期言語霸凌與不當施壓。此人掌握公司 40% 營收的客戶關係，正在推進一個關鍵大案。若此時處理他，大案幾乎確定丟失，對季度營收打擊巨大。但若不處理，指控者揚言向媒體爆料，HR 也警告若不處理將引發組織信任危機。",
+    options: {
+      A: "先保住大案，待交易完成後再處理此人，同時安撫指控者。",
+      B: "立即啟動調查程序，即使影響大案也不迴避，對外表態公司零容忍。",
+      C: "先與指控者和被指控者分別溝通，理解雙方感受，嘗試找到保全所有人的方案。",
+      D: "按照公司既定的申訴調查流程走，不因業績壓力而加速或延後，確保程序正義。"
+    }
+  },
+  {
+    id: 3,
+    title: "併購後的文化衝突與裁員決策",
+    scenario: "你所領導的集團剛完成一樁關鍵併購。被併購公司有一支 120 人的研發團隊，技術能力強但管理風格與母公司截然不同。董事會要求六個月內完成整併並降低 20% 人力成本。被併購公司的元老級主管揚言：若裁員過激，核心工程師會集體出走。但母公司的財務長警告：若不按計畫降本，下一季財報會非常難看。",
+    options: {
+      A: "照董事會要求執行裁員計畫，確保財報數字和投資人信心。",
+      B: "向董事會坦承整併時程不切實際，提出修正方案，即使被質疑領導力。",
+      C: "先保住核心人員和團隊穩定，與元老主管一對一溝通，延後裁員時程。",
+      D: "建立一套明確的人員評估與留用標準，按制度決定去留，避免人情或壓力干預。"
+    }
+  },
+  {
+    id: 4,
+    title: "供應商回扣與行業潛規則",
+    scenario: "你接手一個利潤率極低的事業部。上任第二週，採購主管私下告訴你：前任總經理默許供應商給予 3% 回扣作為部門公關基金，這在行業裡是普遍做法，也是維持客戶關係和內部獎勵的重要資源。如果停掉，採購成本會立刻上升，幾個重要供應商關係也會惡化。但你知道這在公司政策和法規上都有問題。",
+    options: {
+      A: "暫時維持現狀，等事業部恢復獲利後再改革，現在動手只會加速虧損。",
+      B: "立即停止所有回扣安排，向上級報告，即使短期營運受到衝擊。",
+      C: "先與採購主管和核心供應商逐一溝通，了解替代方案，避免突然中斷造成人員恐慌。",
+      D: "建立新的採購管理制度和透明流程，用制度逐步取代潛規則，限期過渡。"
+    }
+  },
+  {
+    id: 5,
+    title: "創辦人與職業經理人的權力拉鋸",
+    scenario: "你是由董事會空降的 CEO，公司創辦人仍擔任董事長。創辦人不斷繞過你直接指揮中階主管，導致決策混亂。多位高管私下向你表達不滿，威脅離職。創辦人對你說：『這是我的公司，你只是來幫忙的。』你知道如果和創辦人攤牌，董事會未必站在你這邊。但如果繼續容忍，管理權威將徹底瓦解。",
+    options: {
+      A: "私下與創辦人協商明確分工，以公司營運績效為籌碼換取管理空間。",
+      B: "正式向董事會提出權責劃分議案，表明若無法獲得完整授權將辭職。",
+      C: "先穩住即將離職的高管團隊，個別安撫，維持組織運作不至崩解。",
+      D: "推動建立正式的決策授權制度和組織架構，用制度約束創辦人的越權行為。"
+    }
+  },
+  {
+    id: 6,
+    title: "產品安全瑕疵與市場時機",
+    scenario: "你帶領的硬體團隊即將發表年度旗艦新品，全球預購量已破紀錄。上市前兩週，品管部門發現一個低機率（約 0.3%）的電池過熱問題。工程評估修復需要延後三個月。行銷團隊警告延期將損失至少兩億元預購退單和品牌信譽。品管主管堅持：雖然機率低，但一旦發生可能造成人身傷害。",
+    options: {
+      A: "按原計畫如期上市，加強售後監控和快速召回機制，搶佔市場窗口。",
+      B: "立刻宣布延期，公開說明原因，即使損失慘重也不能拿消費者安全冒險。",
+      C: "與核心團隊開誠布公地討論風險，共同決策，確保團隊對結果有共識和心理準備。",
+      D: "啟動正式的風險評估流程，依照產品安全法規標準決定是否上市，用制度說話。"
+    }
+  },
+  {
+    id: 7,
+    title: "內部舉報人的保護與業務衝擊",
+    scenario: "一位中階主管向你舉報：公司最大客戶的對接窗口長期要求你方業務提供不實報告，以幫該客戶的內部人粉飾績效。你的業務副總知情但默許，因為這個客戶佔公司營收 25%。舉報人擔心被報復，要求你保密處理。但若處理業務副總，客戶關係可能立即中斷。",
+    options: {
+      A: "先穩住客戶關係，私下處理不實報告問題，避免營收斷崖。",
+      B: "保護舉報人，啟動正式調查，即使可能失去最大客戶也要處理不誠信行為。",
+      C: "先確保舉報人不受報復，再逐步與業務副總溝通改正，給團隊轉圜空間。",
+      D: "啟動合規調查程序，建立正式的舉報保護機制和客戶管理規範。"
+    }
+  },
+  {
+    id: 8,
+    title: "跨國裁員的在地衝突",
+    scenario: "你負責亞太區營運。總部決定關閉東南亞某國工廠以降低成本，影響 800 名員工。該國法規允許裁員但社會氛圍敏感，當地工會已開始串聯。你的當地總經理含淚告訴你，很多員工是跟著公司十幾年的老員工。總部的指示很明確：三個月內完成。但你知道過於粗暴的執行可能引發社會事件，損害品牌在整個東南亞的聲譽。",
+    options: {
+      A: "按總部時程執行，確保成本目標達成，以財務紀律維護集團整體利益。",
+      B: "向總部坦報在地風險，建議調整時程和方式，即使被認為執行力不足。",
+      C: "優先設計最大化員工保障的方案（延長通知期、加強轉職協助），讓員工感受到尊重。",
+      D: "建立一套系統性的工廠關閉標準流程，涵蓋法規合規、利益相關方溝通和風險管理。"
+    }
+  },
+  {
+    id: 9,
+    title: "接班人選拔的忠誠與能力兩難",
+    scenario: "你即將退休，需要選定接班人。候選人甲是跟你打天下的老臣，忠誠度極高、團隊愛戴，但策略視野和變革能力不足。候選人乙是空降兩年的副總，能力強、有國際視野，但與現有團隊磨合不佳，幾位老臣揚言若選乙就離職。董事會傾向選乙，但你知道這可能導致管理層震盪。",
+    options: {
+      A: "選擇乙，公司長期發展和戰略能力比穩定更重要，老臣要走就讓他們走。",
+      B: "公開、透明地說明選擇標準和理由，讓所有候選人和團隊理解決策邏輯。",
+      C: "選擇甲或設計共治方案，保住團隊穩定和老臣們的心，接班後再慢慢改革。",
+      D: "建立一套正式的接班人評估制度，用客觀指標決定，減少個人情感因素。"
+    }
+  },
+  {
+    id: 10,
+    title: "ESG 承諾與短期利潤的衝突",
+    scenario: "你的公司剛公開發布了雄心勃勃的 ESG 減碳目標。但財務分析顯示，要達成第一階段目標，需要關閉一條高利潤但高排放的產線，這將使年利潤減少 18%。股東大會在即，主要投資人已私下施壓要求維持獲利。你的永續長堅持必須按承諾執行，否則公司將面臨漂綠指控。行業觀察者也在盯著你的第一步動作。",
+    options: {
+      A: "延後減碳時程，先維持獲利，向投資人保證長期仍會達成目標。",
+      B: "按承諾執行關閉產線，在股東大會公開說明代價和長期價值。",
+      C: "先與核心團隊和受影響員工充分溝通，確保轉型過程中沒有人被犧牲。",
+      D: "設計分階段的過渡計畫，建立可量化的減碳里程碑和稽核機制。"
+    }
+  },
+  {
+    id: 11,
+    title: "合資夥伴的道德底線衝突",
+    scenario: "你的公司與某地方企業成立合資公司進入新市場。運營一年後，你發現合資夥伴在地方上使用疑似行賄手段打通政商關係。這些做法在當地雖是潛規則，但違反你方公司的全球合規政策。若拆夥，前期投資數千萬將泡湯，且你在董事會面前是力推這個合資案的人。若不拆，一旦曝光，母公司的全球聲譽將嚴重受損。",
+    options: {
+      A: "暫時保持合作，先回收部分投資，同時私下尋找替代方案降低損失。",
+      B: "立即啟動拆夥程序並向母公司合規部報告，承受投資損失和個人信譽代價。",
+      C: "先與合資夥伴坦誠溝通你方立場，嘗試改變其做法，給對方改善的機會。",
+      D: "依照公司合規制度進行正式評估與稽核，由制度決定是否繼續合作。"
+    }
+  },
+  {
+    id: 12,
+    title: "危機中的資訊揭露與團隊信心",
+    scenario: "你的公司正面臨嚴重的現金流危機，按目前消耗速度只剩五個月現金。你正在密集與幾家投資人談判緊急融資。此時，你的核心技術團隊正在衝刺一個關鍵專案，若他們知道公司財務狀況，很可能恐慌離職。但你的 CFO 警告：如果不讓管理層知道實情並實施緊縮，現金可能撐不到融資落地。你面臨一個選擇：要對團隊說多少實話？",
+    options: {
+      A: "只告訴最少數必要的人，維持團隊信心和專案進度，融資是頭等大事。",
+      B: "對管理層全面揭露實情，寧可面對恐慌也不能建立在資訊不對稱上。",
+      C: "分層溝通——對管理層說實情、對基層傳遞謹慎樂觀的訊息，保護團隊心理。",
+      D: "建立危機管理委員會和資訊分級制度，制定標準化的溝通流程和決策機制。"
+    }
+  }
+];
+
+/* ===== 向度定義與解讀資料 ===== */
+const DIMENSIONS = {
+  A: {
+    name: "結果／資本偏向",
+    color: "#4a6fa5",
+    tendency: ["生存", "業績", "融資", "現金流", "股東壓力", "市場窗口"],
+    strengths: ["有現實感", "敢承擔經營壓力", "不容易空談價值"],
+    risks: ["容易合理化灰色決策", "容易弱化誠信、制度、公平", "團隊可能覺得自己只是達標工具"]
+  },
+  B: {
+    name: "原則／誠信偏向",
+    color: "#6b8e5a",
+    tendency: ["真實", "透明", "公平", "領導信用", "組織底線"],
+    strengths: ["可建立長期信任", "邊界感清楚", "不容易進入道德滑坡"],
+    risks: ["可能低估現實壓力", "在生存壓力下容易顯得過硬", "可能被視為「很正確，但不一定能打仗」"]
+  },
+  C: {
+    name: "人員／團隊偏向",
+    color: "#b5854b",
+    tendency: ["關係", "忠誠", "幹部穩定", "士氣", "團隊心理安全"],
+    strengths: ["人願意跟", "比較能留住核心", "不輕易犧牲人"],
+    risks: ["容易延後必要決策", "對該換的人下不了手", "容易把溫情當成熟"]
+  },
+  D: {
+    name: "系統／治理偏向",
+    color: "#7a6b8e",
+    tendency: ["制度", "流程", "長期秩序", "風險控制", "權責清楚", "可持續性"],
+    strengths: ["組織不容易永遠靠英雄撐", "比較能做長期治理", "對中大型組織尤其重要"],
+    risks: ["容易顯得冷", "短期可能不討喜", "若缺少節奏感，會被感受為官僚"]
+  }
+};
+
+const DIMENSION_KEYS = ["A", "B", "C", "D"];
+const TOTAL_QUESTIONS = QUESTIONS.length;
+const REQUIRED_SUM = 10;
+const STORAGE_KEY = "leadership_assessment_data";
+
+/* ===== 狀態管理 ===== */
+let answers = {};
+
+function initAnswers() {
+  QUESTIONS.forEach(q => {
+    answers[q.id] = { scores: { A: "", B: "", C: "", D: "" }, reason: "", cost: "", least: "" };
+  });
+}
+
+/* ===== localStorage 暫存 ===== */
+function saveToStorage() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(answers)); } catch(e) {}
+}
+
+function loadFromStorage() {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) {
+      const parsed = JSON.parse(data);
+      if (parsed && typeof parsed === "object") {
+        answers = parsed;
+        return true;
+      }
+    }
+  } catch(e) {}
+  return false;
+}
+
+function clearStorage() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+}
+
+/* ===== DOM 工具 ===== */
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+/* ===== 渲染題目卡片 ===== */
+function renderQuestions() {
+  const container = $("#questionsContainer");
+  container.innerHTML = QUESTIONS.map(q => `
+    <div class="question-card" id="q${q.id}" data-qid="${q.id}">
+      <div class="question-header">
+        <div class="question-number">${q.id}</div>
+        <div class="question-title">${q.title}</div>
+      </div>
+      <div class="question-scenario">${q.scenario}</div>
+      <div class="question-body">
+        <div class="options-grid">
+          ${DIMENSION_KEYS.map(k => `
+            <div class="option-row">
+              <div class="option-label option-label-${k}">${k}</div>
+              <div class="option-text">${q.options[k]}</div>
+              <div class="option-score">
+                <input type="number" min="0" max="10" placeholder="0"
+                       data-qid="${q.id}" data-dim="${k}"
+                       id="score_${q.id}_${k}"
+                       aria-label="第${q.id}題 選項${k} 分數">
+                <span>分</span>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="score-summary" id="sum_${q.id}">
+          <span>本題分數總和</span>
+          <span id="sumVal_${q.id}">0 / 10</span>
+        </div>
+        <div class="extra-fields">
+          <div class="field-group">
+            <label for="reason_${q.id}">核心理由 <span style="color:var(--error)">*</span></label>
+            <textarea id="reason_${q.id}" data-qid="${q.id}" data-field="reason"
+                      placeholder="請說明你如此分配的核心理由…"></textarea>
+          </div>
+          <div class="field-group">
+            <label for="cost_${q.id}">願意承擔的代價 <span style="color:var(--error)">*</span></label>
+            <textarea id="cost_${q.id}" data-qid="${q.id}" data-field="cost"
+                      placeholder="你的選擇可能帶來什麼犧牲或代價…"></textarea>
+          </div>
+          <div class="field-group">
+            <label>最不願意選的方向 <span style="color:var(--error)">*</span></label>
+            <div class="least-preferred">
+              ${DIMENSION_KEYS.map(k => `
+                <label class="radio-option" data-qid="${q.id}" data-val="${k}">
+                  <input type="radio" name="least_${q.id}" value="${k}"
+                         data-qid="${q.id}" data-field="least">
+                  ${k}：${DIMENSIONS[k].name}
+                </label>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* ===== 渲染題目導覽 ===== */
+function renderNav() {
+  const panel = $("#navPanel");
+  panel.innerHTML = QUESTIONS.map(q => `
+    <a href="#q${q.id}" data-qid="${q.id}" onclick="closeNav()">
+      <span>第 ${q.id} 題</span>
+      <span style="flex:1;font-size:0.82rem;color:rgba(255,255,255,0.5);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${q.title}</span>
+      <span class="nav-status pending" id="navStatus_${q.id}">●</span>
+    </a>
+  `).join("");
+}
+
+function closeNav() {
+  $("#navPanel").classList.remove("open");
+}
+
+/* ===== 事件綁定 ===== */
+function bindEvents() {
+  /* 開始作答 */
+  $("#btnStart").addEventListener("click", () => {
+    $("#heroSection").classList.add("hidden");
+    $("#instructionsSection").classList.remove("hidden");
+    $("#questionsSection").classList.remove("hidden");
+    $("#submitSection").classList.remove("hidden");
+    $("#navbar").classList.remove("hidden");
+    restoreAnswers();
+    updateAllUI();
+    window.scrollTo({ top: $("#instructionsSection").offsetTop - 60, behavior: "smooth" });
+  });
+
+  /* 導覽面板開關 */
+  $("#btnNavToggle").addEventListener("click", () => {
+    $("#navPanel").classList.toggle("open");
+  });
+
+  /* 點擊外部關閉導覽 */
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".navbar")) closeNav();
+  });
+
+  /* 分數輸入 */
+  document.addEventListener("input", (e) => {
+    if (e.target.matches('input[data-dim]')) {
+      const qid = e.target.dataset.qid;
+      const dim = e.target.dataset.dim;
+      let val = parseInt(e.target.value);
+      if (isNaN(val) || val < 0) val = 0;
+      if (val > 10) val = 10;
+      answers[qid].scores[dim] = val;
+      updateQuestionUI(qid);
+      saveToStorage();
+    }
+  });
+
+  /* 限制輸入範圍 */
+  document.addEventListener("change", (e) => {
+    if (e.target.matches('input[data-dim]')) {
+      let val = parseInt(e.target.value);
+      if (isNaN(val) || val < 0) { e.target.value = ""; answers[e.target.dataset.qid].scores[e.target.dataset.dim] = ""; }
+      else if (val > 10) { e.target.value = 10; answers[e.target.dataset.qid].scores[e.target.dataset.dim] = 10; }
+      updateQuestionUI(e.target.dataset.qid);
+      saveToStorage();
+    }
+  });
+
+  /* 文字欄位 */
+  document.addEventListener("input", (e) => {
+    if (e.target.matches('textarea[data-field]')) {
+      const qid = e.target.dataset.qid;
+      const field = e.target.dataset.field;
+      answers[qid][field] = e.target.value;
+      updateQuestionUI(qid);
+      saveToStorage();
+    }
+  });
+
+  /* radio 選擇 */
+  document.addEventListener("change", (e) => {
+    if (e.target.matches('input[data-field="least"]')) {
+      const qid = e.target.dataset.qid;
+      answers[qid].least = e.target.value;
+      /* 更新 selected 樣式 */
+      $$(`label.radio-option[data-qid="${qid}"]`).forEach(el => {
+        el.classList.toggle("selected", el.dataset.val === e.target.value);
+      });
+      updateQuestionUI(qid);
+      saveToStorage();
+    }
+  });
+
+  /* 提交 */
+  $("#btnSubmit").addEventListener("click", handleSubmit);
+}
+
+/* ===== 恢復暫存資料到表單 ===== */
+function restoreAnswers() {
+  QUESTIONS.forEach(q => {
+    const a = answers[q.id];
+    if (!a) return;
+    DIMENSION_KEYS.forEach(k => {
+      const inp = $(`#score_${q.id}_${k}`);
+      if (inp && a.scores[k] !== "" && a.scores[k] !== undefined) inp.value = a.scores[k];
+    });
+    const reasonEl = $(`#reason_${q.id}`);
+    if (reasonEl && a.reason) reasonEl.value = a.reason;
+    const costEl = $(`#cost_${q.id}`);
+    if (costEl && a.cost) costEl.value = a.cost;
+    if (a.least) {
+      const radio = document.querySelector(`input[name="least_${q.id}"][value="${a.least}"]`);
+      if (radio) {
+        radio.checked = true;
+        $$(`label.radio-option[data-qid="${q.id}"]`).forEach(el => {
+          el.classList.toggle("selected", el.dataset.val === a.least);
+        });
+      }
+    }
+  });
+}
+
+/* ===== UI 更新 ===== */
+function getQuestionSum(qid) {
+  const s = answers[qid].scores;
+  let sum = 0;
+  DIMENSION_KEYS.forEach(k => {
+    const v = parseInt(s[k]);
+    if (!isNaN(v)) sum += v;
+  });
+  return sum;
+}
+
+function isQuestionComplete(qid) {
+  const a = answers[qid];
+  const sum = getQuestionSum(qid);
+  const allScoresFilled = DIMENSION_KEYS.every(k => a.scores[k] !== "" && a.scores[k] !== undefined);
+  return allScoresFilled && sum === REQUIRED_SUM && a.reason.trim() !== "" && a.cost.trim() !== "" && a.least !== "";
+}
+
+function updateQuestionUI(qid) {
+  const sum = getQuestionSum(qid);
+  const sumEl = $(`#sum_${qid}`);
+  const sumValEl = $(`#sumVal_${qid}`);
+  sumValEl.textContent = `${sum} / ${REQUIRED_SUM}`;
+  sumEl.classList.toggle("error", sum !== REQUIRED_SUM);
+  sumEl.classList.toggle("ok", sum === REQUIRED_SUM);
+  updateProgress();
+  updateNavStatus(qid);
+}
+
+function updateAllUI() {
+  QUESTIONS.forEach(q => updateQuestionUI(q.id));
+}
+
+function updateProgress() {
+  let completed = 0;
+  QUESTIONS.forEach(q => { if (isQuestionComplete(q.id)) completed++; });
+  $("#progressText").textContent = `${completed} / ${TOTAL_QUESTIONS}`;
+  const pct = (completed / TOTAL_QUESTIONS) * 100;
+  $("#progressBar").style.width = pct + "%";
+  updateValidationSummary();
+}
+
+function updateNavStatus(qid) {
+  const statusEl = $(`#navStatus_${qid}`);
+  if (!statusEl) return;
+  if (isQuestionComplete(qid)) {
+    statusEl.className = "nav-status done";
+    statusEl.textContent = "✓";
+  } else {
+    const sum = getQuestionSum(qid);
+    const a = answers[qid];
+    const hasAnyInput = DIMENSION_KEYS.some(k => a.scores[k] !== "" && a.scores[k] !== undefined) || a.reason || a.cost || a.least;
+    if (hasAnyInput) {
+      statusEl.className = "nav-status incomplete";
+      statusEl.textContent = "⚠";
+    } else {
+      statusEl.className = "nav-status pending";
+      statusEl.textContent = "●";
+    }
+  }
+}
+
+function updateValidationSummary() {
+  const container = $("#validationSummary");
+  let items = [];
+  let allComplete = true;
+  QUESTIONS.forEach(q => {
+    const a = answers[q.id];
+    const sum = getQuestionSum(q.id);
+    const complete = isQuestionComplete(q.id);
+    if (!complete) allComplete = false;
+    const issues = [];
+    if (sum !== REQUIRED_SUM) issues.push(`分數總和為 ${sum}（需要 ${REQUIRED_SUM}）`);
+    if (!a.reason.trim()) issues.push("未填寫核心理由");
+    if (!a.cost.trim()) issues.push("未填寫願意承擔的代價");
+    if (!a.least) issues.push("未選擇最不願意選的方向");
+    if (issues.length > 0) {
+      items.push(`<div class="validation-item fail">
+        <span class="vi-icon">✗</span>
+        <span>第 ${q.id} 題：${issues.join("、")}</span>
+      </div>`);
+    } else {
+      items.push(`<div class="validation-item pass">
+        <span class="vi-icon">✓</span>
+        <span>第 ${q.id} 題：已完成</span>
+      </div>`);
+    }
+  });
+  container.innerHTML = `<h3 style="font-size:1.1rem;margin-bottom:16px">作答檢核</h3>` + items.join("");
+}
+
+/* ===== 提交處理 ===== */
+function handleSubmit() {
+  const errors = [];
+  QUESTIONS.forEach(q => {
+    if (!isQuestionComplete(q.id)) {
+      errors.push(q.id);
+    }
+  });
+
+  if (errors.length > 0) {
+    const firstErr = errors[0];
+    const card = $(`#q${firstErr}`);
+    card.classList.add("highlight");
+    setTimeout(() => card.classList.remove("highlight"), 2500);
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    alert(`尚有 ${errors.length} 題未完成，請檢查後再提交。已自動捲動到第 ${firstErr} 題。`);
+    return;
+  }
+
+  showResults();
+}
+
+/* ===== 計算並顯示結果 ===== */
+function showResults() {
+  const totals = { A: 0, B: 0, C: 0, D: 0 };
+  QUESTIONS.forEach(q => {
+    DIMENSION_KEYS.forEach(k => {
+      totals[k] += parseInt(answers[q.id].scores[k]) || 0;
+    });
+  });
+
+  const maxScore = TOTAL_QUESTIONS * REQUIRED_SUM;
+  const sorted = DIMENSION_KEYS.map(k => ({ key: k, score: totals[k] }))
+    .sort((a, b) => b.score - a.score);
+
+  /* 隱藏作答區，顯示結果 */
+  $("#instructionsSection").classList.add("hidden");
+  $("#questionsSection").classList.add("hidden");
+  $("#submitSection").classList.add("hidden");
+  $("#resultSection").style.display = "block";
+  $("#navbar").classList.add("hidden");
+
+  const container = $("#resultContainer");
+  container.innerHTML = `
+    <div class="result-header">
+      <h2>評鑑結果分析</h2>
+      <p>以下為您在 ${TOTAL_QUESTIONS} 道高衝突情境中的領導偏好分析</p>
+    </div>
+
+    <!-- 長條圖 -->
+    <div class="chart-container">
+      <h3>四大向度得分分佈</h3>
+      <div class="bar-chart">
+        ${sorted.map(item => {
+          const pct = maxScore > 0 ? (item.score / maxScore * 100) : 0;
+          return `
+            <div class="bar-row">
+              <div class="bar-label">${item.key}：${DIMENSIONS[item.key].name}</div>
+              <div class="bar-track">
+                <div class="bar-fill bar-fill-${item.key}" style="width:0%" data-target="${pct}">
+                  ${item.score}
+                </div>
+              </div>
+              <div class="bar-value">${item.score}</div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+
+    <!-- 排名 -->
+    <div class="rank-summary">
+      <div class="rank-card highest">
+        <div class="rank-label">最高分向度</div>
+        <div class="rank-dim" style="color:${DIMENSIONS[sorted[0].key].color}">${sorted[0].key}：${DIMENSIONS[sorted[0].key].name}</div>
+        <div class="rank-score">${sorted[0].score} 分</div>
+      </div>
+      <div class="rank-card second">
+        <div class="rank-label">第二高分向度</div>
+        <div class="rank-dim" style="color:${DIMENSIONS[sorted[1].key].color}">${sorted[1].key}：${DIMENSIONS[sorted[1].key].name}</div>
+        <div class="rank-score">${sorted[1].score} 分</div>
+      </div>
+      <div class="rank-card lowest">
+        <div class="rank-label">最低分向度</div>
+        <div class="rank-dim" style="color:${DIMENSIONS[sorted[3].key].color}">${sorted[3].key}：${DIMENSIONS[sorted[3].key].name}</div>
+        <div class="rank-score">${sorted[3].score} 分</div>
+      </div>
+    </div>
+
+    <!-- 解讀 -->
+    ${sorted.map((item, idx) => {
+      const d = DIMENSIONS[item.key];
+      const rankLabel = idx === 0 ? "（您的最高偏好）" : idx === 1 ? "（第二偏好）" : idx === 2 ? "（第三偏好）" : "（最低偏好）";
+      return `
+        <div class="interpretation-card">
+          <h3>
+            <span class="interp-badge" style="background:${d.color}">${item.key}</span>
+            ${d.name} ${rankLabel} — ${item.score} 分
+          </h3>
+          <div class="interp-section">
+            <h4>偏向先保</h4>
+            <ul>${d.tendency.map(t => `<li>${t}</li>`).join("")}</ul>
+          </div>
+          <div class="interp-section">
+            <h4>優勢</h4>
+            <ul>${d.strengths.map(s => `<li>${s}</li>`).join("")}</ul>
+          </div>
+          <div class="interp-section">
+            <h4>風險</h4>
+            <ul>${d.risks.map(r => `<li>${r}</li>`).join("")}</ul>
+          </div>
+        </div>
+      `;
+    }).join("")}
+
+    <!-- 成熟度判斷提示 -->
+    <div class="maturity-note">
+      <h3>成熟度判斷提示</h3>
+      <p style="margin-bottom:16px;color:rgba(255,255,255,0.75);font-size:0.92rem">成熟的受測者通常具備以下特徵：</p>
+      <ol>
+        <li>不會每題平均分配（若每題都是 2-3-3-2，可能在迴避真正的取捨）</li>
+        <li>理由裡會談代價，而不只談立場（能說出「我知道這樣做會犧牲什麼」）</li>
+        <li>能承認自己最怕失去什麼（對「最不願意選的方向」有深刻反思）</li>
+        <li>不會把自己寫成永遠兼顧一切的人（承認在壓力下必須有所取捨）</li>
+        <li>能分清「此刻先保什麼」與「之後怎麼補救」（有時序思維而非全有全無）</li>
+      </ol>
+    </div>
+
+    <!-- 每題明細 -->
+    <button class="detail-toggle" id="btnDetailToggle" onclick="toggleDetail()">展開查看每題作答摘要 ▾</button>
+    <div class="detail-panel" id="detailPanel">
+      ${QUESTIONS.map(q => {
+        const a = answers[q.id];
+        return `
+          <div class="detail-item">
+            <h4>第 ${q.id} 題：${q.title}</h4>
+            <div class="detail-scores">
+              ${DIMENSION_KEYS.map(k => `
+                <span class="detail-score-chip" style="background:${DIMENSIONS[k].color}22;color:${DIMENSIONS[k].color};border:1px solid ${DIMENSIONS[k].color}44">
+                  ${k}：${a.scores[k]} 分
+                </span>
+              `).join("")}
+            </div>
+            <div class="detail-meta">
+              <strong>核心理由：</strong>${escapeHtml(a.reason)}<br>
+              <strong>願意承擔的代價：</strong>${escapeHtml(a.cost)}<br>
+              <strong>最不願意選的方向：</strong>${a.least}（${DIMENSIONS[a.least].name}）
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+
+    <!-- 操作按鈕 -->
+    <div class="result-actions">
+      <button class="btn-action print" onclick="window.print()">列印結果</button>
+      <button class="btn-action export" onclick="exportJSON()">匯出 JSON</button>
+      <button class="btn-action restart" onclick="restartAssessment()">重新作答</button>
+    </div>
+  `;
+
+  /* 動態長條圖進場動畫 */
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      $$(".bar-fill").forEach(el => {
+        el.style.width = el.dataset.target + "%";
+      });
+    }, 300);
+  });
+}
+
+/* ===== 工具函式 ===== */
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function toggleDetail() {
+  const panel = $("#detailPanel");
+  const btn = $("#btnDetailToggle");
+  panel.classList.toggle("open");
+  btn.textContent = panel.classList.contains("open") ? "收合每題作答摘要 ▴" : "展開查看每題作答摘要 ▾";
+}
+
+function exportJSON() {
+  const totals = { A: 0, B: 0, C: 0, D: 0 };
+  QUESTIONS.forEach(q => {
+    DIMENSION_KEYS.forEach(k => {
+      totals[k] += parseInt(answers[q.id].scores[k]) || 0;
+    });
+  });
+  const data = {
+    title: "領導者高衝突評鑑題本",
+    timestamp: new Date().toISOString(),
+    totals,
+    answers: QUESTIONS.map(q => ({
+      id: q.id,
+      title: q.title,
+      scores: { ...answers[q.id].scores },
+      reason: answers[q.id].reason,
+      cost: answers[q.id].cost,
+      least: answers[q.id].least
+    }))
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `leadership_assessment_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function restartAssessment() {
+  if (!confirm("確定要清除所有作答內容並重新開始嗎？")) return;
+  clearStorage();
+  initAnswers();
+  $("#resultSection").style.display = "none";
+  $("#heroSection").classList.remove("hidden");
+  $("#navbar").classList.add("hidden");
+  window.scrollTo({ top: 0 });
+}
+
+/* ===== 初始化 ===== */
+function init() {
+  initAnswers();
+  const hasData = loadFromStorage();
+  renderQuestions();
+  renderNav();
+  bindEvents();
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>

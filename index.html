@@ -300,11 +300,12 @@ h1, h2, h3, h4 { font-weight: 600; line-height: 1.3; }
 .score-summary {
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 20px;
-  background: var(--success-bg);
-  border: 1px solid var(--success);
+  background: var(--bg-section);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 24px;
   font-weight: 600;
+  color: var(--text-muted);
   transition: all var(--transition);
 }
 
@@ -1149,11 +1150,23 @@ function isQuestionComplete(qid) {
 
 function updateQuestionUI(qid) {
   const sum = getQuestionSum(qid);
+  const a = answers[qid];
+  const hasAnyScore = DIMENSION_KEYS.some(k => a.scores[k] !== "" && a.scores[k] !== undefined);
   const sumEl = $(`#sum_${qid}`);
   const sumValEl = $(`#sumVal_${qid}`);
   sumValEl.textContent = `${sum} / ${REQUIRED_SUM}`;
-  sumEl.classList.toggle("error", sum !== REQUIRED_SUM);
-  sumEl.classList.toggle("ok", sum === REQUIRED_SUM);
+
+  sumEl.classList.remove("error", "ok");
+  sumEl.style.background = "";
+  sumEl.style.borderColor = "";
+  sumEl.style.color = "";
+
+  if (sum === REQUIRED_SUM) {
+    sumEl.classList.add("ok");
+  } else if (hasAnyScore) {
+    sumEl.classList.add("error");
+  }
+
   updateProgress();
   updateNavStatus(qid);
 }
@@ -1452,6 +1465,28 @@ function init() {
   renderQuestions();
   renderNav();
   bindEvents();
+
+  if (hasData) {
+    const hasAnyAnswer = QUESTIONS.some(q => {
+      const a = answers[q.id];
+      return DIMENSION_KEYS.some(k => a.scores[k] !== "" && a.scores[k] !== undefined) || a.reason || a.cost || a.least;
+    });
+    if (hasAnyAnswer) {
+      const resume = confirm("偵測到先前的作答紀錄，是否繼續上次的作答？\n\n按「確定」繼續上次進度，按「取消」重新開始。");
+      if (resume) {
+        $("#heroSection").classList.add("hidden");
+        $("#instructionsSection").classList.remove("hidden");
+        $("#questionsSection").classList.remove("hidden");
+        $("#submitSection").classList.remove("hidden");
+        $("#navbar").classList.remove("hidden");
+        restoreAnswers();
+        updateAllUI();
+      } else {
+        clearStorage();
+        initAnswers();
+      }
+    }
+  }
 }
 
 document.addEventListener("DOMContentLoaded", init);

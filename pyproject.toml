@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tw-presale-crawler"
+version = "0.1.0"
+description = "Crawler for Taiwan MOI presale project filing data"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "playwright",
+    "requests",
+]
+
+[project.scripts]
+presale-crawler = "tw_presale_crawler.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

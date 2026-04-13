@@ -1,0 +1,13 @@
+---
+description: 台灣預售建案爬蟲規則
+globs:
+  - "src/tw_presale_crawler/**/*.py"
+  - "README.md"
+alwaysApply: false
+---
+
+- 針對 `https://lvr.land.moi.gov.tw` 的 `list.jsp` / `saleRemark` 查詢，優先使用 Playwright，不要先假設 `requests + BeautifulSoup` 可以直接抓到清單。
+- 這個站點在頁面初始化時會讀取 `localStorage["form-data"]`。若該值不存在，頁面會拋出 `Cannot read properties of null (reading 'qryType')`，後續縣市選單與查詢流程都可能失效。
+- 查詢前先透過 `SERVICE/CITY` 與 `SERVICE/CITY/{cityCode}/` 解析縣市與行政區代碼，並接受 `台` / `臺` 兩種輸入。
+- 查詢成功後優先攔截 `SERVICE/QueryPrice/SaleData/...` 回應，保留原始 JSON；CSV 只做便於閱讀的欄位投影。
+- 除錯時可暫時輸出 HTML 或攔截到的 API URL，但不要把大型除錯檔案提交到 repo。

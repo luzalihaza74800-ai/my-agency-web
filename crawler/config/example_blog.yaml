@@ -1,0 +1,67 @@
+# ============================================================
+#  範例：部落格文章爬蟲設定
+#  使用方式：python main.py -c crawler/config/example_blog.yaml
+# ============================================================
+
+name: "blog-crawler"
+description: "爬取部落格文章列表與內容"
+
+engine:
+  timeout: 30
+  max_retries: 3
+  request_delay: 1.5
+  random_delay: true
+  rotate_user_agent: true
+
+# 使用分頁模式爬取文章列表
+mode: "pagination"
+
+urls:
+  - "https://example-blog.com/articles"
+
+pagination:
+  next_page_selector: "a.pagination-next"
+  max_pages: 10
+  items_selector: "article.post-card"
+  item_rules:
+    - field: "title"
+      selector: "h2.post-title"
+      type: "css"
+      first: true
+    - field: "link"
+      selector: "a.post-link"
+      type: "css"
+      attr: "href"
+      first: true
+    - field: "summary"
+      selector: "p.post-excerpt"
+      type: "css"
+      first: true
+    - field: "date"
+      selector: "time"
+      type: "css"
+      attr: "datetime"
+      first: true
+    - field: "author"
+      selector: "span.author-name"
+      type: "css"
+      first: true
+
+rules: []
+
+pipeline:
+  steps:
+    - "strip_whitespace"
+    - "remove_empty_fields"
+    - "clean_html_tags"
+
+export:
+  format: "both"
+  output_dir: "./output/blog"
+  filename: "articles"
+  json_indent: 2
+  csv_encoding: "utf-8-sig"
+
+logging:
+  level: "INFO"
+  file: "./output/blog/crawler.log"

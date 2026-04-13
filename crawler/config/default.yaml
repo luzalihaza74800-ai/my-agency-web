@@ -1,0 +1,123 @@
+# ============================================================
+#  爬蟲設定檔 (Crawler Configuration)
+#  複製此檔案並修改成你的需求：cp default.yaml my_site.yaml
+# ============================================================
+
+# --- 爬蟲基本資訊 ---
+name: "my-crawler"
+description: "範例爬蟲設定"
+
+# --- 爬蟲引擎設定 ---
+engine:
+  timeout: 30                    # 請求逾時（秒）
+  max_retries: 3                 # 最大重試次數
+  retry_delay: 2                 # 重試間隔基數（秒）
+  request_delay: 1.0             # 請求間隔（秒）
+  random_delay: true             # 是否加入隨機延遲
+  follow_redirects: true         # 是否跟隨重定向
+  respect_robots_txt: true       # 是否遵守 robots.txt
+  rotate_user_agent: true        # 是否輪替 User-Agent
+  # user_agent: "Custom Bot/1.0" # 固定 User-Agent（rotate_user_agent=false 時使用）
+  # proxy: "http://127.0.0.1:7890"  # HTTP 代理
+  headers:                       # 自訂請求標頭
+    Accept-Language: "zh-TW,zh;q=0.9,en;q=0.8"
+
+# --- 爬蟲模式設定 ---
+# 可選模式: single_page / pagination / recursive / sitemap
+mode: "single_page"
+
+# --- 目標 URL ---
+# 單頁模式：可以是單一 URL 或 URL 列表
+urls:
+  - "https://example.com/page1"
+  # - "https://example.com/page2"
+
+# --- 分頁模式專用設定 ---
+pagination:
+  # 策略一：從頁面中找「下一頁」連結
+  next_page_selector: "a.next-page"
+  # 策略二：URL 模板翻頁
+  # url_template: "https://example.com/list?page={page}"
+  # start_page: 1
+  # end_page: 10
+  max_pages: 20
+  items_selector: "div.item"      # 每頁列表項的選擇器
+  item_rules:                     # 每個列表項的提取規則
+    - field: "title"
+      selector: "h3.title"
+      type: "css"
+      first: true
+    - field: "link"
+      selector: "a"
+      type: "css"
+      attr: "href"
+      first: true
+
+# --- 遞迴模式專用設定 ---
+recursive:
+  max_depth: 3                    # 最大遞迴深度
+  max_pages: 100                  # 最大爬取頁數
+  same_domain: true               # 限制同網域
+  link_selector: "a"              # 連結選擇器
+  # url_pattern: "/blog/.*"       # URL 正則過濾
+
+# --- Sitemap 模式專用設定 ---
+sitemap:
+  sitemap_url: "https://example.com/sitemap.xml"
+  max_pages: 500
+  follow_sitemap_index: true
+  # url_pattern: "/product/.*"    # URL 正則過濾
+
+# --- 資料提取規則 ---
+# 在單頁/遞迴/sitemap 模式下使用
+rules:
+  - field: "title"
+    selector: "h1"
+    type: "css"                   # css / regex / css_html
+    first: true
+    default: ""
+
+  - field: "content"
+    selector: "article.content"
+    type: "css"
+    first: true
+    default: ""
+
+  - field: "date"
+    selector: "time"
+    type: "css"
+    attr: "datetime"
+    first: true
+
+  - field: "tags"
+    selector: "span.tag"
+    type: "css"
+    first: false                  # false = 返回列表
+
+  # 使用正則表達式提取
+  # - field: "price"
+  #   selector: "\\$([\\d,.]+)"
+  #   type: "regex"
+  #   group: 0
+  #   first: true
+
+# --- 資料處理管線 ---
+pipeline:
+  steps:
+    - "strip_whitespace"          # 去除空白
+    - "remove_empty_fields"       # 移除空欄位
+    - "clean_html_tags"           # 清除 HTML 標籤
+    # - "deduplicate_by:url"      # 按欄位去重
+
+# --- 資料輸出設定 ---
+export:
+  format: "json"                  # json / csv / both
+  output_dir: "./output"          # 輸出目錄
+  filename: "results"             # 檔名（不含副檔名）
+  json_indent: 2                  # JSON 縮排
+  csv_encoding: "utf-8-sig"       # CSV 編碼（utf-8-sig 可讓 Excel 正常顯示中文）
+
+# --- 日誌設定 ---
+logging:
+  level: "INFO"                   # DEBUG / INFO / WARNING / ERROR
+  file: "./output/crawler.log"    # 日誌檔案路徑（留空則僅輸出到終端）

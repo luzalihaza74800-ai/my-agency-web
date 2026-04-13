@@ -1,0 +1,74 @@
+# ============================================================
+#  範例：電商商品爬蟲設定
+#  使用方式：python main.py -c crawler/config/example_ecommerce.yaml
+# ============================================================
+
+name: "ecommerce-crawler"
+description: "爬取電商網站商品資訊"
+
+engine:
+  timeout: 20
+  max_retries: 3
+  request_delay: 2.0
+  random_delay: true
+  rotate_user_agent: true
+
+# 使用分頁模式（URL 模板翻頁）
+mode: "pagination"
+
+urls: []
+
+pagination:
+  url_template: "https://example-shop.com/products?page={page}&sort=newest"
+  start_page: 1
+  end_page: 20
+  max_pages: 20
+  items_selector: "div.product-card"
+  item_rules:
+    - field: "product_name"
+      selector: "h3.product-title"
+      type: "css"
+      first: true
+    - field: "price"
+      selector: "span.price"
+      type: "css"
+      first: true
+    - field: "original_price"
+      selector: "span.original-price"
+      type: "css"
+      first: true
+      default: ""
+    - field: "image"
+      selector: "img.product-image"
+      type: "css"
+      attr: "src"
+      first: true
+    - field: "link"
+      selector: "a.product-link"
+      type: "css"
+      attr: "href"
+      first: true
+    - field: "rating"
+      selector: "span.rating-value"
+      type: "css"
+      first: true
+      default: "N/A"
+
+rules: []
+
+pipeline:
+  steps:
+    - "strip_whitespace"
+    - "remove_empty_fields"
+    - "deduplicate_by:product_name"
+
+export:
+  format: "both"
+  output_dir: "./output/ecommerce"
+  filename: "products"
+  json_indent: 2
+  csv_encoding: "utf-8-sig"
+
+logging:
+  level: "INFO"
+  file: "./output/ecommerce/crawler.log"

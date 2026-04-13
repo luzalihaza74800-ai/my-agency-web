@@ -81,17 +81,41 @@ python3 -m tw_presale_crawler.cli \
   --save-debug-json output/xitun/raw.json
 ```
 
+### 一次抓整個台中市所有行政區
+
+```bash
+python3 -m tw_presale_crawler.cli \
+  --city "臺中市" \
+  --all-districts \
+  --start-year 110 \
+  --start-month 7 \
+  --output-dir output/taichung-all \
+  --save-debug-dir output/taichung-all/debug-html
+```
+
+這個模式會額外輸出：
+
+- `output/taichung-all/city_summary.csv`
+- `output/taichung-all/all_presale_projects_normalized.csv`
+- `output/taichung-all/districts/<行政區代碼>/...`
+- `output/taichung-all/errors.json`（只有失敗時才會有）
+
 ### 常用參數
 
 - `--city`：縣市名稱，例如 `臺中市`
 - `--district`：行政區名稱，例如 `西屯區`
+- `--all-districts`：抓指定縣市全部行政區
+- `--district-limit`：批次測試時限制行政區數量
 - `--start-year`：民國年，預設 `110`
 - `--start-month`：月份，預設 `7`
 - `--end-year`：民國年，預設 `115`
 - `--end-month`：月份，預設 `12`
 - `--output-dir`：輸出目錄，會生成 `presale_projects.json`、`presale_projects.csv`、`metadata.json`
 - `--show-browser`：用有畫面的瀏覽器跑
+- `--delay-seconds`：批次抓取時每區之間的等待秒數
+- `--fail-fast`：批次模式一旦有區失敗就立刻停止
 - `--save-debug-html`：保存載入後頁面 HTML
+- `--save-debug-dir`：批次模式下依行政區保存 HTML
 - `--save-debug-json`：保存 API 原始 JSON
 
 ## 已驗證的結果
@@ -151,11 +175,19 @@ python3 -m tw_presale_crawler.cli \
 
 下一步很適合做的有：
 
-1. 批次抓所有台中市行政區
-2. 自動比對新舊資料差異
-3. 匯入 SQLite / PostgreSQL
-4. 加上重試、排程與每日增量更新
-5. 針對單一建案再延伸抓交易明細
+1. 自動比對新舊資料差異
+2. 匯入 SQLite / PostgreSQL
+3. 加上重試、排程與每日增量更新
+4. 針對單一建案再延伸抓交易明細
+5. 為每個建案建立歷次備查版本追蹤
+
+## 測試
+
+目前已補上不依賴官方網站的最小測試：
+
+```bash
+python3 -m pytest tests/test_cli.py
+```
 
 ## 一句話結論
 

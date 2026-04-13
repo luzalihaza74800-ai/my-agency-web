@@ -13,6 +13,11 @@ dependencies = [
     "requests",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
 [project.scripts]
 presale-crawler = "tw_presale_crawler.cli:main"
 

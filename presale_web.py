@@ -251,6 +251,115 @@ def api_start():
         limit=int(f["limit"]) if f.get("limit") else None)).start()
     return jsonify({"job_id": job_id})
 
+@app.post("/api/start-taiwan")
+def api_start_taiwan():
+    if _running_job_count() >= MAX_CONCURRENT_JOBS:
+        return jsonify({"error": f"目前已有 {MAX_CONCURRENT_JOBS} 個爬蟲在執行，請等待完成後再啟動"}), 429
+    f      = request.json or {}
+    starty = str(f.get("starty", "101"))
+    endy   = str(f.get("endy",   "115"))
+    dtype  = f.get("data_type", "presale")
+    delay  = float(f.get("delay", 0.5))
+
+    job_id = uuid.uuid4().hex
+    JOBS[job_id] = _make_job(dtype, "ALL", "", starty, endy)
+
+    def _run_taiwan():
+        job        = JOBS[job_id]
+        q          = job["queue"]
+        stop_event = job["stop_event"]
+        old_stdout = sys.stdout
+        sys.stdout = QueueWriter(q)
+
+        CITY_ORDER = [
+            "A","F","C","O","I","B","D","E","H","G",
+            "J","K","N","M","Q","P","T","U","V","W","X","Z"
+        ]
+        TOWN_MAP = {
+            "A":["A01","A02","A03","A04","A05","A06","A07","A08","A09","A10","A11","A12"],
+            "F":["F01","F02","F03","F04","F05","F06","F07","F08","F09","F10","F11","F12","F13","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23","F24","F25","F26","F27","F28","F29"],
+            "C":["C01","C02","C03","C04","C05","C06","C07"],
+            "B":["B01","B02","B03","B04","B05","B06","B07","B08","B09","B10","B11","B12","B13","B14","B15","B16","B17","B18","B19","B20","B21","B22","B23","B24","B25","B26","B27","B28","B29"],
+            "D":["D01","D02","D03","D04","D05","D06","D07","D08","D09","D10","D11","D12","D13","D14","D15","D16","D17","D18","D19","D20","D21","D22","D23","D24","D25","D26","D27","D28","D29","D30","D31","D32","D33","D34","D35","D36","D37"],
+            "E":["E01","E02","E03","E04","E05","E06","E07","E08","E09","E10","E11","E12","E13","E16","E17","E18","E19","E20","E21","E22","E23","E24","E25","E26","E27","E28","E29","E30","E31","E32","E33","E34","E35","E36","E40"],
+            "H":["H01","H02","H03","H04","H05","H06","H07","H08","H09","H10","H11","H12","H13"],
+            "I":["I01","I02"],
+            "J":["J01","J02","J03","J04","J05","J06","J07","J08","J09","J10","J11","J12","J13"],
+            "K":["K01","K02","K03","K04","K05","K06","K07","K08","K09","K10","K11","K12","K13","K14","K16","K17","K18"],
+            "M":["M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12","M13"],
+            "N":["N01","N02","N03","N04","N05","N06","N07","N08","N09","N10","N11","N12","N13","N14","N15","N16","N17","N18","N19","N20","N21","N22","N23","N24","N25","N26"],
+            "O":["O01","O02","O03"],
+            "P":["P01","P02","P03","P04","P05","P06","P07","P08","P09","P10","P11","P12","P13","P14","P15","P16","P17","P18"],
+            "Q":["Q01","Q02","Q03","Q04","Q05","Q06","Q07","Q08","Q09","Q10","Q11","Q12","Q13","Q14","Q15","Q16","Q17","Q18","Q19","Q20"],
+            "T":["T01","T02","T03","T04","T05","T06","T07","T08","T09","T10","T11","T12","T13","T14","T15","T16","T17","T18","T19","T20","T21","T22","T23","T24","T25","T26","T27","T28","T29","T30","T31","T32","T33"],
+            "U":["U01","U02","U03","U04","U05","U06","U07","U08","U09","U10","U11","U12","U13"],
+            "V":["V01","V02","V03","V04","V05","V06","V07","V08","V09","V10","V11","V12","V13","V14","V15","V16"],
+            "W":["W01","W02","W03"],
+            "X":["X01","X02","X03","X04","X05","X06"],
+            "G":["G01","G02","G03","G04","G05","G06","G07","G08","G09","G10","G11","G12"],
+            "Z":["Z01","Z02","Z03","Z04"],
+        }
+        city_name_map = {v:k for k,v in CITY_CODE.items()}
+        total_cities  = len(CITY_ORDER)
+
+        try:
+            for ci, city in enumerate(CITY_ORDER, 1):
+                if stop_event.is_set(): break
+                towns     = TOWN_MAP.get(city, [""])
+                city_name = city_name_map.get(city, city)
+                print(f"[全台 {ci}/{total_cities}] {city_name} 共 {len(towns)} 個行政區")
+
+                for town in towns:
+                    if stop_event.is_set(): break
+                    hist_id = None
+                    try:
+                        if dtype == "presale":
+                            hist_id = _db.history_start("presale", city, town, starty, endy)
+                            bldg_rows, tx_rows = crawl(
+                                city=city, town=town,
+                                starty=starty, endy=endy,
+                                delay=delay, layer2=True, layer3=True,
+                                stop_event=stop_event,
+                            )
+                            _db.history_done(hist_id, len(bldg_rows), len(tx_rows))
+                            job["live_bldg"] += len(bldg_rows)
+                            job["live_tx"]   += len(tx_rows)
+                        else:
+                            hist_id = _db.history_start("resale", city, town, starty, endy)
+                            tx_total, tx_new = crawl_resale(
+                                city=city, town=town,
+                                starty=starty, endy=endy,
+                                delay=delay, stop_event=stop_event,
+                            )
+                            _db.history_done(hist_id, 0, tx_new)
+                            job["live_tx"] += tx_new
+                    except Exception as e:
+                        print(f"  ✗ {city_name}/{town} 失敗：{e}")
+                        if hist_id:
+                            try: _db.history_error(hist_id, str(e))
+                            except: pass
+                    time.sleep(1.0)
+
+            if stop_event.is_set():
+                job["status"] = "stopped"
+                q.put(("stopped", json.dumps([])))
+            else:
+                job["status"] = "done"
+                stats = _db.get_stats()
+                print(f"[全台完成] 建案:{stats['buildings']} 預售:{stats['presale_tx']} 買賣:{stats['resale_tx']}")
+                q.put(("done", json.dumps([])))
+        except Exception as e:
+            job["status"] = "error"
+            q.put(("log", f"[ERROR] {e}"))
+            q.put(("error", str(e)))
+        finally:
+            sys.stdout = old_stdout
+            q.put(None)
+
+    threading.Thread(target=_run_taiwan, daemon=True).start()
+    return jsonify({"job_id": job_id})
+
+
 @app.post("/api/start-resale")
 def api_start_resale():
     if _running_job_count() >= MAX_CONCURRENT_JOBS:
@@ -584,7 +693,7 @@ async function startCrawl(){
   const starty=parseInt(document.getElementById('inp-starty').value);const startm=parseInt(document.getElementById('inp-startm').value);
   const endy=parseInt(document.getElementById('inp-endy').value);const endm=parseInt(document.getElementById('inp-endm').value);
   const taiwan=document.getElementById('chk-taiwan').checked;
-  if(taiwan){doStart(city,town,starty,startm,endy,endm);return;}
+  if(taiwan){doStartTaiwan(starty,startm,endy,endm);return;}
   const cov=await fetch('/api/coverage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data_type:currentType,city,town,starty,endy})}).then(r=>r.json());
   const ranges=cov.uncovered_ranges||[];const covYrs=cov.covered_years||[];
   if(ranges.length===0){
@@ -603,6 +712,19 @@ async function startCrawl(){
 function _startRanges(city,town,ranges,idx,startm,endm){
   if(idx>=ranges.length)return;const[s,e]=ranges[idx];
   doStart(city,town,s,idx===0?startm:1,e,idx===ranges.length-1?endm:12,()=>_startRanges(city,town,ranges,idx+1,startm,endm));
+}
+function doStartTaiwan(starty,startm,endy,endm){
+  const delay=document.getElementById('inp-delay').value;
+  fetch('/api/start-taiwan',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({data_type:currentType,starty:String(starty),endy:String(endy),delay:parseFloat(delay)})})
+    .then(r=>{if(r.status===429)return r.json().then(d=>{addLog(`⚠️ ${d.error}`,'warn');throw new Error('busy');});return r.json();})
+    .then(d=>{
+      if(!d||!d.job_id)return;
+      startSSE(d.job_id,currentType);
+      document.getElementById('btn-stop').style.display='inline-block';
+      document.getElementById('btn-start').disabled=true;
+      addLog(`▶ 全台模式開始爬取（${currentType==='presale'?'預售屋':'買賣成屋'}）${starty}~${endy}年`,'ok');
+    }).catch(e=>{if(e.message!=='busy')addLog(`❌ 啟動失敗：${e}`,'err');});
 }
 function doStart(city,town,starty,startm,endy,endm,onDone){
   const delay=document.getElementById('inp-delay').value;

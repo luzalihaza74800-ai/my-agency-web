@@ -621,7 +621,7 @@ let _statsThrottle=0,_ckptThrottle=0,_histThrottle=0,_mapThrottle=0;
 function startSSE(jobId,type,onDone){
   type=type||currentType;const j=jobs[type];if(j.evt)j.evt.close();j.jobId=jobId;j.evt=new EventSource(`/api/progress/${jobId}`);
   j.evt.addEventListener('log',e=>{addLog(e.data);const now=Date.now();if(now-_statsThrottle>8000){_statsThrottle=now;loadStats();}if(now-_ckptThrottle>10000){_ckptThrottle=now;loadCkpts();}if(now-_histThrottle>10000){_histThrottle=now;loadHistory();}if(now-_mapThrottle>20000&&_mapInited){_mapThrottle=now;loadMapData();}loadRunningBadge();});
-  j.evt.addEventListener('done',e=>{let files=[];try{files=JSON.parse(e.data);}catch{}addLog('✅ 爬取完成！自動下載資料庫中…','ok');showDownloads(files);finishJob(type);loadStats();loadCkpts();loadHistory();loadRunningBadge();if(_mapInited)loadMapData();setTimeout(()=>{const a=document.createElement('a');a.href='/api/download-db';a.download='';document.body.appendChild(a);a.click();document.body.removeChild(a);addLog('💾 資料庫已自動下載到 iPad','ok');},800);if(onDone)onDone();});
+  j.evt.addEventListener('done',e=>{let files=[];try{files=JSON.parse(e.data);}catch{}addLog('✅ 爬取完成！','ok');showDownloads(files);finishJob(type);loadStats();loadCkpts();loadHistory();loadRunningBadge();if(_mapInited)loadMapData();if(onDone)onDone();});
   j.evt.addEventListener('stopped',()=>{addLog('⏹ 已停止，進度已儲存','warn');finishJob(type);loadStats();loadCkpts();loadHistory();loadRunningBadge();});
   j.evt.addEventListener('error',e=>{addLog(`❌ ${e.data}`,'err');finishJob(type);loadStats();loadHistory();loadRunningBadge();});
   j.evt.onerror=()=>{addLog('[連線中斷]','warn');finishJob(type);loadRunningBadge();};

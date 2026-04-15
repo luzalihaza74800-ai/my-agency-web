@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys, os, json, time, uuid, threading, queue, traceback
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from flask import Flask, render_template_string, request, Response, send_file, jsonify
 
@@ -16,7 +17,7 @@ import scheduler as _sched
 app  = Flask(__name__)
 JOBS = {}
 OUT  = os.path.dirname(os.path.abspath(__file__))
-MAX_CONCURRENT_JOBS = 2
+MAX_CONCURRENT_JOBS = 3
 
 def _running_job_count():
     return sum(1 for j in JOBS.values() if j.get("status") == "running")
@@ -251,6 +252,193 @@ def api_start():
         limit=int(f["limit"]) if f.get("limit") else None)).start()
     return jsonify({"job_id": job_id})
 
+# ── 全台模式 checkpoint 路徑 ─────────────────────────────────────────────────
+TAIWAN_CKPT_DIR = os.path.expanduser("~/.presale_crawler")
+def _taiwan_ckpt_path(dtype, starty, endy):
+    return os.path.join(TAIWAN_CKPT_DIR, f"ckpt_taiwan_{dtype}_{starty}_{endy}.json")
+
+def _save_taiwan_ckpt(dtype, starty, endy, done_pairs):
+    path = _taiwan_ckpt_path(dtype, starty, endy)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump({"dtype": dtype, "starty": starty, "endy": endy,
+                   "done_pairs": done_pairs,
+                   "saved_at": datetime.now().isoformat()}, f, ensure_ascii=False)
+
+def _load_taiwan_ckpt(dtype, starty, endy):
+    path = _taiwan_ckpt_path(dtype, starty, endy)
+    if not os.path.exists(path): return None
+    try:
+        with open(path, "r", encoding="utf-8") as f: return json.load(f)
+    except: return None
+
+def _delete_taiwan_ckpt(dtype, starty, endy):
+    path = _taiwan_ckpt_path(dtype, starty, endy)
+    if os.path.exists(path): os.remove(path)
+
+def _list_taiwan_ckpts():
+    result = []
+    for fname in os.listdir(TAIWAN_CKPT_DIR):
+        if not fname.startswith("ckpt_taiwan_"): continue
+        try:
+            with open(os.path.join(TAIWAN_CKPT_DIR, fname), "r") as f:
+                result.append(json.load(f))
+        except: pass
+    return result
+
+
+TAIWAN_TOWN_MAP = {
+    "A":["A01","A02","A03","A04","A05","A06","A07","A08","A09","A10","A11","A12"],
+    "F":["F01","F02","F03","F04","F05","F06","F07","F08","F09","F10","F11","F12","F13","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23","F24","F25","F26","F27","F28","F29"],
+    "C":["C01","C02","C03","C04","C05","C06","C07"],
+    "B":["B01","B02","B03","B04","B05","B06","B07","B08","B09","B10","B11","B12","B13","B14","B15","B16","B17","B18","B19","B20","B21","B22","B23","B24","B25","B26","B27","B28","B29"],
+    "D":["D01","D02","D03","D04","D05","D06","D07","D08","D09","D10","D11","D12","D13","D14","D15","D16","D17","D18","D19","D20","D21","D22","D23","D24","D25","D26","D27","D28","D29","D30","D31","D32","D33","D34","D35","D36","D37"],
+    "E":["E01","E02","E03","E04","E05","E06","E07","E08","E09","E10","E11","E12","E13","E16","E17","E18","E19","E20","E21","E22","E23","E24","E25","E26","E27","E28","E29","E30","E31","E32","E33","E34","E35","E36","E40"],
+    "H":["H01","H02","H03","H04","H05","H06","H07","H08","H09","H10","H11","H12","H13"],
+    "I":["I01","I02"],
+    "J":["J01","J02","J03","J04","J05","J06","J07","J08","J09","J10","J11","J12","J13"],
+    "K":["K01","K02","K03","K04","K05","K06","K07","K08","K09","K10","K11","K12","K13","K14","K16","K17","K18"],
+    "M":["M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12","M13"],
+    "N":["N01","N02","N03","N04","N05","N06","N07","N08","N09","N10","N11","N12","N13","N14","N15","N16","N17","N18","N19","N20","N21","N22","N23","N24","N25","N26"],
+    "O":["O01","O02","O03"],
+    "P":["P01","P02","P03","P04","P05","P06","P07","P08","P09","P10","P11","P12","P13","P14","P15","P16","P17","P18"],
+    "Q":["Q01","Q02","Q03","Q04","Q05","Q06","Q07","Q08","Q09","Q10","Q11","Q12","Q13","Q14","Q15","Q16","Q17","Q18","Q19","Q20"],
+    "T":["T01","T02","T03","T04","T05","T06","T07","T08","T09","T10","T11","T12","T13","T14","T15","T16","T17","T18","T19","T20","T21","T22","T23","T24","T25","T26","T27","T28","T29","T30","T31","T32","T33"],
+    "U":["U01","U02","U03","U04","U05","U06","U07","U08","U09","U10","U11","U12","U13"],
+    "V":["V01","V02","V03","V04","V05","V06","V07","V08","V09","V10","V11","V12","V13","V14","V15","V16"],
+    "W":["W01","W02","W03"],
+    "X":["X01","X02","X03","X04","X05","X06"],
+    "G":["G01","G02","G03","G04","G05","G06","G07","G08","G09","G10","G11","G12"],
+    "Z":["Z01","Z02","Z03","Z04"],
+}
+TAIWAN_CITY_ORDER = ["A","F","C","O","I","B","D","E","H","G","J","K","N","M","Q","P","T","U","V","W","X","Z"]
+
+
+@app.get("/api/taiwan-ckpts")
+def api_taiwan_ckpts():
+    ckpts = _list_taiwan_ckpts()
+    city_name_map = {v:k for k,v in CITY_CODE.items()}
+    result = []
+    for c in ckpts:
+        done  = len(c.get("done_pairs", []))
+        total = sum(len(TAIWAN_TOWN_MAP.get(city, [""])) for city in TAIWAN_CITY_ORDER)
+        cur_city = ""
+        # 找出下一個未完成的縣市
+        done_set = set(tuple(x) for x in c.get("done_pairs", []))
+        for city in TAIWAN_CITY_ORDER:
+            for town in TAIWAN_TOWN_MAP.get(city, [""]):
+                if (city, town) not in done_set:
+                    cur_city = city_name_map.get(city, city)
+                    break
+            if cur_city: break
+        result.append({
+            "dtype": c["dtype"], "starty": c["starty"], "endy": c["endy"],
+            "done": done, "total": total, "saved_at": c.get("saved_at",""),
+            "cur_city": cur_city,
+        })
+    return jsonify(result)
+
+@app.delete("/api/taiwan-ckpts/<dtype>/<starty>/<endy>")
+def api_del_taiwan_ckpt(dtype, starty, endy):
+    _delete_taiwan_ckpt(dtype, starty, endy)
+    return jsonify({"ok": True})
+
+@app.post("/api/resume-taiwan")
+def api_resume_taiwan():
+    f      = request.json or {}
+    dtype  = f.get("dtype", "presale")
+    starty = f.get("starty", "101")
+    endy   = f.get("endy",   "115")
+    delay  = float(f.get("delay", 0.5))
+    ckpt   = _load_taiwan_ckpt(dtype, starty, endy)
+    if not ckpt: return jsonify({"error": "找不到全台 checkpoint"}), 404
+    job_id = uuid.uuid4().hex
+    JOBS[job_id] = _make_job(dtype, "ALL", "", starty, endy)
+    done_pairs = [tuple(x) for x in ckpt.get("done_pairs", [])]
+    threading.Thread(target=_run_taiwan_job, daemon=True,
+        kwargs=dict(job_id=job_id, dtype=dtype, starty=starty, endy=endy,
+                    delay=delay, done_pairs=done_pairs)).start()
+    return jsonify({"job_id": job_id})
+
+
+def _run_taiwan_job(job_id, dtype, starty, endy, delay=0.5, done_pairs=None):
+    """3 執行緒並行，逐縣市逐行政區爬取，每完成一個行政區存 checkpoint"""
+    job        = JOBS[job_id]
+    q          = job["queue"]
+    stop_event = job["stop_event"]
+    city_name_map = {v:k for k,v in CITY_CODE.items()}
+
+    done_set  = set(done_pairs or [])
+    lock      = threading.Lock()
+    log_lock  = threading.Lock()
+
+    # 展開所有 (city, town) 任務，略過已完成
+    all_pairs = [(city, town)
+                 for city in TAIWAN_CITY_ORDER
+                 for town in TAIWAN_TOWN_MAP.get(city, [""])]
+    todo = [p for p in all_pairs if p not in done_set]
+    total = len(all_pairs)
+
+    def log(msg):
+        with log_lock:
+            q.put(("log", msg))
+
+    def do_one(city, town):
+        if stop_event.is_set(): return
+        city_name = city_name_map.get(city, city)
+        hist_id = None
+        try:
+            if dtype == "presale":
+                hist_id = _db.history_start("presale", city, town, starty, endy)
+                bldg_rows, tx_rows = crawl(
+                    city=city, town=town, starty=starty, endy=endy,
+                    delay=delay, layer2=True, layer3=True, stop_event=stop_event)
+                _db.history_done(hist_id, len(bldg_rows), len(tx_rows))
+                with lock:
+                    job["live_bldg"] += len(bldg_rows)
+                    job["live_tx"]   += len(tx_rows)
+            else:
+                hist_id = _db.history_start("resale", city, town, starty, endy)
+                tx_total, tx_new = crawl_resale(
+                    city=city, town=town, starty=starty, endy=endy,
+                    delay=delay, stop_event=stop_event)
+                _db.history_done(hist_id, 0, tx_new)
+                with lock:
+                    job["live_tx"] += tx_new
+            with lock:
+                done_set.add((city, town))
+                _save_taiwan_ckpt(dtype, starty, endy, list(done_set))
+            done_count = len(done_set)
+            log(f"[全台 {done_count}/{total}] ✓ {city_name}/{town}")
+        except Exception as e:
+            log(f"[全台] ✗ {city_name}/{town} 失敗：{e}")
+            if hist_id:
+                try: _db.history_error(hist_id, str(e))
+                except: pass
+
+    log(f"▶ 全台模式啟動（{dtype}），共 {len(todo)} 個行政區待爬，3 執行緒並行")
+
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = {executor.submit(do_one, city, town): (city, town) for city, town in todo}
+        for fut in as_completed(futures):
+            if stop_event.is_set():
+                executor.shutdown(wait=False, cancel_futures=True)
+                break
+            try: fut.result()
+            except: pass
+
+    if stop_event.is_set():
+        job["status"] = "stopped"
+        log("⏹ 全台爬取已停止，進度已儲存，可從「未完成任務」繼續")
+        q.put(("stopped", json.dumps([])))
+    else:
+        _delete_taiwan_ckpt(dtype, starty, endy)
+        job["status"] = "done"
+        stats = _db.get_stats()
+        log(f"✅ 全台爬取完成！建案:{stats['buildings']} 預售:{stats['presale_tx']} 買賣:{stats['resale_tx']}")
+        q.put(("done", json.dumps([])))
+    q.put(None)
+
+
 @app.post("/api/start-taiwan")
 def api_start_taiwan():
     if _running_job_count() >= MAX_CONCURRENT_JOBS:
@@ -260,103 +448,10 @@ def api_start_taiwan():
     endy   = str(f.get("endy",   "115"))
     dtype  = f.get("data_type", "presale")
     delay  = float(f.get("delay", 0.5))
-
     job_id = uuid.uuid4().hex
     JOBS[job_id] = _make_job(dtype, "ALL", "", starty, endy)
-
-    def _run_taiwan():
-        job        = JOBS[job_id]
-        q          = job["queue"]
-        stop_event = job["stop_event"]
-        old_stdout = sys.stdout
-        sys.stdout = QueueWriter(q)
-
-        CITY_ORDER = [
-            "A","F","C","O","I","B","D","E","H","G",
-            "J","K","N","M","Q","P","T","U","V","W","X","Z"
-        ]
-        TOWN_MAP = {
-            "A":["A01","A02","A03","A04","A05","A06","A07","A08","A09","A10","A11","A12"],
-            "F":["F01","F02","F03","F04","F05","F06","F07","F08","F09","F10","F11","F12","F13","F14","F15","F16","F17","F18","F19","F20","F21","F22","F23","F24","F25","F26","F27","F28","F29"],
-            "C":["C01","C02","C03","C04","C05","C06","C07"],
-            "B":["B01","B02","B03","B04","B05","B06","B07","B08","B09","B10","B11","B12","B13","B14","B15","B16","B17","B18","B19","B20","B21","B22","B23","B24","B25","B26","B27","B28","B29"],
-            "D":["D01","D02","D03","D04","D05","D06","D07","D08","D09","D10","D11","D12","D13","D14","D15","D16","D17","D18","D19","D20","D21","D22","D23","D24","D25","D26","D27","D28","D29","D30","D31","D32","D33","D34","D35","D36","D37"],
-            "E":["E01","E02","E03","E04","E05","E06","E07","E08","E09","E10","E11","E12","E13","E16","E17","E18","E19","E20","E21","E22","E23","E24","E25","E26","E27","E28","E29","E30","E31","E32","E33","E34","E35","E36","E40"],
-            "H":["H01","H02","H03","H04","H05","H06","H07","H08","H09","H10","H11","H12","H13"],
-            "I":["I01","I02"],
-            "J":["J01","J02","J03","J04","J05","J06","J07","J08","J09","J10","J11","J12","J13"],
-            "K":["K01","K02","K03","K04","K05","K06","K07","K08","K09","K10","K11","K12","K13","K14","K16","K17","K18"],
-            "M":["M01","M02","M03","M04","M05","M06","M07","M08","M09","M10","M11","M12","M13"],
-            "N":["N01","N02","N03","N04","N05","N06","N07","N08","N09","N10","N11","N12","N13","N14","N15","N16","N17","N18","N19","N20","N21","N22","N23","N24","N25","N26"],
-            "O":["O01","O02","O03"],
-            "P":["P01","P02","P03","P04","P05","P06","P07","P08","P09","P10","P11","P12","P13","P14","P15","P16","P17","P18"],
-            "Q":["Q01","Q02","Q03","Q04","Q05","Q06","Q07","Q08","Q09","Q10","Q11","Q12","Q13","Q14","Q15","Q16","Q17","Q18","Q19","Q20"],
-            "T":["T01","T02","T03","T04","T05","T06","T07","T08","T09","T10","T11","T12","T13","T14","T15","T16","T17","T18","T19","T20","T21","T22","T23","T24","T25","T26","T27","T28","T29","T30","T31","T32","T33"],
-            "U":["U01","U02","U03","U04","U05","U06","U07","U08","U09","U10","U11","U12","U13"],
-            "V":["V01","V02","V03","V04","V05","V06","V07","V08","V09","V10","V11","V12","V13","V14","V15","V16"],
-            "W":["W01","W02","W03"],
-            "X":["X01","X02","X03","X04","X05","X06"],
-            "G":["G01","G02","G03","G04","G05","G06","G07","G08","G09","G10","G11","G12"],
-            "Z":["Z01","Z02","Z03","Z04"],
-        }
-        city_name_map = {v:k for k,v in CITY_CODE.items()}
-        total_cities  = len(CITY_ORDER)
-
-        try:
-            for ci, city in enumerate(CITY_ORDER, 1):
-                if stop_event.is_set(): break
-                towns     = TOWN_MAP.get(city, [""])
-                city_name = city_name_map.get(city, city)
-                print(f"[全台 {ci}/{total_cities}] {city_name} 共 {len(towns)} 個行政區")
-
-                for town in towns:
-                    if stop_event.is_set(): break
-                    hist_id = None
-                    try:
-                        if dtype == "presale":
-                            hist_id = _db.history_start("presale", city, town, starty, endy)
-                            bldg_rows, tx_rows = crawl(
-                                city=city, town=town,
-                                starty=starty, endy=endy,
-                                delay=delay, layer2=True, layer3=True,
-                                stop_event=stop_event,
-                            )
-                            _db.history_done(hist_id, len(bldg_rows), len(tx_rows))
-                            job["live_bldg"] += len(bldg_rows)
-                            job["live_tx"]   += len(tx_rows)
-                        else:
-                            hist_id = _db.history_start("resale", city, town, starty, endy)
-                            tx_total, tx_new = crawl_resale(
-                                city=city, town=town,
-                                starty=starty, endy=endy,
-                                delay=delay, stop_event=stop_event,
-                            )
-                            _db.history_done(hist_id, 0, tx_new)
-                            job["live_tx"] += tx_new
-                    except Exception as e:
-                        print(f"  ✗ {city_name}/{town} 失敗：{e}")
-                        if hist_id:
-                            try: _db.history_error(hist_id, str(e))
-                            except: pass
-                    time.sleep(1.0)
-
-            if stop_event.is_set():
-                job["status"] = "stopped"
-                q.put(("stopped", json.dumps([])))
-            else:
-                job["status"] = "done"
-                stats = _db.get_stats()
-                print(f"[全台完成] 建案:{stats['buildings']} 預售:{stats['presale_tx']} 買賣:{stats['resale_tx']}")
-                q.put(("done", json.dumps([])))
-        except Exception as e:
-            job["status"] = "error"
-            q.put(("log", f"[ERROR] {e}"))
-            q.put(("error", str(e)))
-        finally:
-            sys.stdout = old_stdout
-            q.put(None)
-
-    threading.Thread(target=_run_taiwan, daemon=True).start()
+    threading.Thread(target=_run_taiwan_job, daemon=True,
+        kwargs=dict(job_id=job_id, dtype=dtype, starty=starty, endy=endy, delay=delay)).start()
     return jsonify({"job_id": job_id})
 
 
@@ -423,6 +518,13 @@ def api_checkpoints():
 @app.delete("/api/checkpoints/<ckpt_type>/<city>/<town>/<starty>/<endy>")
 def api_del_checkpoint(ckpt_type, city, town, starty, endy):
     delete_checkpoint(city, town, starty, endy, ckpt_type=ckpt_type); return jsonify({"ok": True})
+
+@app.post("/api/del-checkpoint")
+def api_del_checkpoint_post():
+    f = request.json or {}
+    delete_checkpoint(f.get("city",""), f.get("town",""), f.get("starty",""),
+                      f.get("endy",""), ckpt_type=f.get("dtype","presale"))
+    return jsonify({"ok": True})
 
 @app.get("/api/progress/<job_id>")
 def api_progress(job_id):
@@ -674,18 +776,72 @@ function loadTowns(){
 }
 function loadStats(){fetch('/api/stats').then(r=>r.json()).then(d=>{document.getElementById('st-bldg').textContent=d.buildings?.toLocaleString()||'0';document.getElementById('st-presale').textContent=d.presale_tx?.toLocaleString()||'0';document.getElementById('st-resale').textContent=d.resale_tx?.toLocaleString()||'0';});}
 function loadCkpts(){
-  fetch('/api/checkpoints').then(r=>r.json()).then(list=>{
+  Promise.all([
+    fetch('/api/checkpoints').then(r=>r.json()),
+    fetch('/api/taiwan-ckpts').then(r=>r.json()),
+  ]).then(([list, taiwanList])=>{
     const panel=document.getElementById('ckpt-panel');const cont=document.getElementById('ckpt-list');
-    if(!list.length){panel.style.display='none';return;}panel.style.display='';
-    cont.innerHTML=list.map(c=>{
-      const pct=c.total?Math.round(c.done/c.total*100):0;const label=c.ckpt_type==='resale'?'買賣':'預售';
-      const cityNm=CITIES.find(x=>x[0]===c.city)?.[1]||c.city;const townNm=(TOWNS[c.city]||[]).find(x=>x[0]===c.town)?.[1]||c.town||'全市';
-      return `<div class="ckpt-row"><div class="d-flex justify-content-between align-items-start"><div><span class="badge bg-${c.ckpt_type==='resale'?'success':'primary'} me-1">${label}</span><strong>${cityNm} ${townNm}</strong><span class="text-muted ms-2">${c.starty}~${c.endy}年</span><span class="ms-2 text-secondary small">${c.done}/${c.total} (${pct}%)</span><div class="text-muted small mt-1">儲存於 ${c.saved_at?.slice(0,19)||''}</div></div><div class="d-flex gap-1"><button class="btn btn-sm btn-outline-primary" onclick="resumeCkpt('${c.ckpt_type}','${c.city}','${c.town}','${c.starty}','${c.endy}')"><i class="bi bi-play-fill"></i> 繼續</button><button class="btn btn-sm btn-outline-danger" onclick="delCkpt('${c.ckpt_type}','${c.city}','${c.town}','${c.starty}','${c.endy}')"><i class="bi bi-x"></i></button></div></div></div>`;
-    }).join('');
+    const all = [];
+
+    // 一般 checkpoint（單縣市）
+    list.forEach(c=>{
+      const pct=c.total?Math.round(c.done/c.total*100):0;
+      const label=c.ckpt_type==='resale'?'買賣':'預售';
+      const cityNm=CITIES.find(x=>x[0]===c.city)?.[1]||c.city;
+      const townNm=(TOWNS[c.city]||[]).find(x=>x[0]===c.town)?.[1]||c.town||'全市';
+      all.push(`<div class="ckpt-row"><div class="d-flex justify-content-between align-items-start">
+        <div><span class="badge bg-${c.ckpt_type==='resale'?'success':'primary'} me-1">${label}</span>
+        <strong>${cityNm} ${townNm}</strong>
+        <span class="text-muted ms-2">${c.starty}~${c.endy}年</span>
+        <span class="ms-2 text-secondary small">${c.done}/${c.total} (${pct}%)</span>
+        <div class="text-muted small mt-1">儲存於 ${c.saved_at?.slice(0,19)||''}</div></div>
+        <div class="d-flex gap-1">
+          <button class="btn btn-sm btn-outline-primary" onclick="resumeCkpt('${c.ckpt_type}','${c.city}','${c.town}','${c.starty}','${c.endy}')"><i class="bi bi-play-fill"></i> 繼續</button>
+          <button class="btn btn-sm btn-outline-danger" onclick="delCkpt('${c.ckpt_type}','${c.city}','${c.town}','${c.starty}','${c.endy}')"><i class="bi bi-x"></i></button>
+        </div></div></div>`);
+    });
+
+    // 全台 checkpoint
+    taiwanList.forEach(c=>{
+      const pct=c.total?Math.round(c.done/c.total*100):0;
+      const label=c.dtype==='resale'?'買賣':'預售';
+      const curTxt=c.cur_city?`<span class="badge bg-warning text-dark ms-2">目前：${c.cur_city}</span>`:'';
+      all.push(`<div class="ckpt-row" style="background:#e8f5e9"><div class="d-flex justify-content-between align-items-start">
+        <div><span class="badge bg-${c.dtype==='resale'?'success':'primary'} me-1">${label}</span>
+        <strong>🌏 全台模式</strong>${curTxt}
+        <span class="text-muted ms-2">${c.starty}~${c.endy}年</span>
+        <span class="ms-2 text-secondary small">${c.done}/${c.total} (${pct}%)</span>
+        <div class="text-muted small mt-1">儲存於 ${c.saved_at?.slice(0,19)||''}</div></div>
+        <div class="d-flex gap-1">
+          <button class="btn btn-sm btn-outline-primary" onclick="resumeTaiwanCkpt('${c.dtype}','${c.starty}','${c.endy}')"><i class="bi bi-play-fill"></i> 繼續</button>
+          <button class="btn btn-sm btn-outline-danger" onclick="delTaiwanCkpt('${c.dtype}','${c.starty}','${c.endy}')"><i class="bi bi-x"></i></button>
+        </div></div></div>`);
+    });
+
+    if(!all.length){panel.style.display='none';return;}
+    panel.style.display='';
+    cont.innerHTML=all.join('');
   });
 }
+function resumeTaiwanCkpt(dtype,starty,endy){
+  fetch('/api/resume-taiwan',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({dtype,starty,endy,delay:parseFloat(document.getElementById('inp-delay').value||0.5)})})
+    .then(r=>r.json()).then(d=>{
+      if(d.error){alert(d.error);return;}
+      setType(dtype);startSSE(d.job_id,dtype);
+      document.getElementById('btn-stop').style.display='inline-block';
+      document.getElementById('btn-start').disabled=true;
+      loadStats();loadCkpts();loadHistory();loadRunningBadge();
+    });
+}
+function delTaiwanCkpt(dtype,starty,endy){
+  fetch(`/api/taiwan-ckpts/${dtype}/${starty}/${endy}`,{method:'DELETE'}).then(()=>loadCkpts());
+}
 function resumeCkpt(dtype,city,town,starty,endy){fetch('/api/resume',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data_type:dtype,city,town,starty,endy})}).then(r=>r.json()).then(d=>{if(d.error){alert(d.error);return;}setType(dtype);startSSE(d.job_id,dtype);document.getElementById('btn-stop').style.display='inline-block';document.getElementById('btn-start').disabled=true;loadStats();loadCkpts();loadHistory();loadRunningBadge();});}
-function delCkpt(dtype,city,town,starty,endy){fetch(`/api/checkpoints/${dtype}/${city}/${town}/${starty}/${endy}`,{method:'DELETE'}).then(()=>loadCkpts());}
+function delCkpt(dtype,city,town,starty,endy){
+  fetch('/api/del-checkpoint',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({dtype,city,town,starty,endy})}).then(()=>loadCkpts());
+}
 async function startCrawl(){
   const runInfo=await fetch('/api/jobs/running').then(r=>r.json());
   if(runInfo.count>=runInfo.max){addLog(`⚠️ 已達最大並行數（${runInfo.max} 個）`,'warn');return;}

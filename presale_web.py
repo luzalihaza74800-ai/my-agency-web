@@ -335,6 +335,15 @@ def api_download(filename):
     if not os.path.exists(path): return "Not found", 404
     return send_file(path, as_attachment=True, download_name=filename, mimetype="text/csv")
 
+@app.get("/api/download-db")
+def api_download_db():
+    from db import DB_PATH
+    if not os.path.exists(DB_PATH): return "Not found", 404
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return send_file(DB_PATH, as_attachment=True,
+                     download_name=f"presale_data_{ts}.db",
+                     mimetype="application/octet-stream")
+
 
 HTML = r"""<!doctype html>
 <html lang="zh-Hant">
@@ -376,10 +385,13 @@ body{background:#f0f2f5;font-family:"Noto Sans TC",sans-serif;}
       <i class="bi bi-building-fill fs-2 text-primary me-3"></i>
       <div><h4 class="mb-0 fw-bold">不動產實價爬蟲</h4><small class="text-muted">台灣內政部不動產交易實價查詢</small></div>
     </div>
-    <div class="d-flex gap-2" id="db-stats">
+    <div class="d-flex gap-2 align-items-center flex-wrap" id="db-stats">
       <div class="stat-box bg-white shadow-sm"><div class="stat-num" id="st-bldg">—</div><div class="stat-lbl">預售建案</div></div>
       <div class="stat-box bg-white shadow-sm"><div class="stat-num" id="st-presale">—</div><div class="stat-lbl">預售成交</div></div>
       <div class="stat-box bg-white shadow-sm"><div class="stat-num" id="st-resale">—</div><div class="stat-lbl">買賣成交</div></div>
+      <a href="/api/download-db" class="btn btn-success fw-bold px-3" style="border-radius:12px;white-space:nowrap">
+        <i class="bi bi-database-down me-1"></i>下載資料庫<br><small style="font-size:.7rem;font-weight:400">存到 iPad</small>
+      </a>
     </div>
   </div>
   <div id="running-badge" style="display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:500;color:#856404;align-items:center;gap:6px;margin-bottom:10px"></div>

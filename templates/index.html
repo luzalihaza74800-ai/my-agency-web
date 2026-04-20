@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Firecrawl 網站爬取管理</title>
+  <style>
+    :root {
+      --bg: #0f1117; --surface: #1a1d27; --surface2: #242836;
+      --border: #2e3345; --text: #e4e6ef; --text2: #8b8fa3;
+      --primary: #6366f1; --primary-hover: #818cf8;
+      --success: #22c55e; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6;
+      --radius: 12px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+    }
+
+    .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 20px 0; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .header h1 { font-size: 1.4rem; font-weight: 700; }
+    .header p  { color: var(--text2); font-size: 0.84rem; margin-top: 4px; }
+    .main { padding: 24px 0; }
+
+    /* card */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 22px; margin-bottom: 22px;
+    }
+    .card h2 { font-size: 1rem; margin-bottom: 14px; font-weight: 600; }
+
+    /* form */
+    .form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.grow { flex: 1; min-width: 200px; }
+    .form-group label { font-size: 0.79rem; color: var(--text2); font-weight: 500; }
+    .form-group input, .form-group select {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 13px; color: var(--text);
+      font-size: 0.92rem; outline: none; transition: border-color .2s;
+    }
+    .form-group input:focus { border-color: var(--primary); }
+
+    .checkbox-row { display:flex; align-items:center; gap:8px; padding-bottom:2px; }
+    .checkbox-row input[type=checkbox] {
+      width:16px; height:16px; accent-color: var(--primary);
+    }
+    .checkbox-row label { font-size:0.84rem; color: var(--text2); cursor:pointer; }
+
+    /* buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px;
+      border: none; border-radius: 8px; font-size: 0.86rem; font-weight: 600;
+      cursor: pointer; transition: background .2s, transform .1s; white-space: nowrap;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
+    .btn-warning { background: var(--warning); color: #000; }
+    .btn-success { background: var(--success); color: #000; }
+    .btn-danger  { background: rgba(239,68,68,.15); color: var(--danger); border: 1px solid rgba(239,68,68,.3); }
+    .btn-sm { padding: 5px 13px; font-size: 0.79rem; }
+    .btn-outline { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+    .btn-outline:hover { border-color: var(--text2); color: var(--text); }
+
+    /* job cards */
+    .job-list { display: flex; flex-direction: column; gap: 14px; }
+    .job-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .job-header {
+      padding: 14px 18px; display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+    .job-url { font-weight: 600; font-size: 0.92rem; word-break: break-all; }
+    .job-meta { display: flex; gap: 12px; font-size: 0.76rem; color: var(--text2); margin-top: 3px; flex-wrap:wrap; }
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 0.71rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+    }
+    .badge-running  { background: rgba(99,102,241,.2); color: var(--primary); }
+    .badge-paused   { background: rgba(245,158,11,.15); color: var(--warning); }
+    .badge-completed{ background: rgba(34,197,94,.15); color: var(--success); }
+    .badge-failed   { background: rgba(239,68,68,.15); color: var(--danger); }
+    .badge-pending  { background: rgba(139,143,163,.15); color: var(--text2); }
+
+    .job-progress { padding: 0 18px; }
+    .progress-bar-bg { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+    .progress-bar-fill {
+      height: 100%; background: var(--primary); border-radius: 3px; transition: width .4s;
+    }
+    .progress-bar-fill.done { background: var(--success); }
+    .progress-text {
+      display: flex; justify-content: space-between; font-size: 0.75rem;
+      color: var(--text2); margin-top: 4px; padding-bottom: 10px;
+    }
+    .job-actions {
+      padding: 10px 18px; border-top: 1px solid var(--border);
+      display: flex; gap: 7px; flex-wrap: wrap;
+    }
+
+    /* logs */
+    .log-panel { border-top: 1px solid var(--border); padding: 12px 18px; display: none; }
+    .log-panel.open { display: block; }
+    .log-panel h4 { font-size: 0.8rem; color: var(--text2); margin-bottom: 6px; }
+    .log-lines {
+      max-height: 220px; overflow-y: auto;
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 0.76rem; line-height: 1.65; color: var(--text2);
+      background: var(--bg); border-radius: 6px; padding: 10px 12px;
+    }
+    .log-lines .log-ok  { color: var(--success); }
+    .log-lines .log-err { color: var(--danger); }
+
+    /* results */
+    .results-panel {
+      border-top: 1px solid var(--border); max-height: 400px;
+      overflow-y: auto; display: none;
+    }
+    .results-panel.open { display: block; }
+    .result-item {
+      padding: 11px 18px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background .15s;
+    }
+    .result-item:hover { background: var(--surface2); }
+    .result-item-url   { font-size: 0.82rem; color: var(--info); word-break: break-all; }
+    .result-item-status { font-size: 0.72rem; margin-top: 3px; }
+    .result-item-status.ok  { color: var(--success); }
+    .result-item-status.err { color: var(--danger); }
+
+    /* modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.65);
+      z-index: 1000; justify-content: center; align-items: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); width: 92%; max-width: 850px;
+      max-height: 85vh; display: flex; flex-direction: column;
+    }
+    .modal-header {
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-header h3 { font-size: 0.9rem; word-break: break-all; }
+    .modal-body { padding: 18px; overflow-y: auto; flex: 1; }
+    .modal-body pre {
+      white-space: pre-wrap; word-break: break-word;
+      font-size: 0.85rem; line-height: 1.7; color: var(--text);
+    }
+    .close-btn {
+      background: none; border: none; color: var(--text2);
+      font-size: 1.3rem; cursor: pointer;
+    }
+    .close-btn:hover { color: var(--text); }
+
+    .empty-state { text-align: center; padding: 50px 20px; color: var(--text2); }
+    .empty-state p { margin-top: 8px; font-size: 0.87rem; }
+
+    @media (max-width: 640px) {
+      .form-row { flex-direction: column; }
+      .form-group.grow { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="container">
+    <h1>Firecrawl 網站爬取管理</h1>
+    <p>支援暫停 / 斷點續傳 · 即時進度 · 日誌追蹤</p>
+  </div>
+</div>
+
+<div class="main">
+  <div class="container">
+
+    <!-- New Job Form -->
+    <div class="card">
+      <h2>建立新爬取任務</h2>
+      <div class="form-row">
+        <div class="form-group grow">
+          <label for="url">目標網址</label>
+          <input id="url" type="url" placeholder="https://example.com" value="https://lohas.taichung.gov.tw/webgis/" />
+        </div>
+        <div class="form-group" style="width:90px">
+          <label for="limit">頁數上限</label>
+          <input id="limit" type="number" value="50" min="1" max="500" />
+        </div>
+        <div class="form-group" style="width:90px">
+          <label for="depth">爬取深度</label>
+          <input id="depth" type="number" value="3" min="1" max="10" />
+        </div>
+        <div class="form-group">
+          <label>&nbsp;</label>
+          <button id="startBtn" class="btn btn-primary" onclick="createJob()">開始爬取</button>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="checkbox-row">
+          <input type="checkbox" id="fastMode" checked />
+          <label for="fastMode">快速模式（略過 JavaScript 渲染，適合重型網頁如 GIS 地圖）</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job List -->
+    <div id="jobList" class="job-list"></div>
+
+  </div>
+</div>
+
+<!-- Result Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">—</h3>
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <pre id="modalBody"></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '/api/jobs';
+let streams = {};
+
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  return res.json();
+}
+
+async function createJob() {
+  const btn = document.getElementById('startBtn');
+  const url = document.getElementById('url').value.trim();
+  if (!url) return alert('請輸入目標網址');
+  btn.disabled = true; btn.textContent = '建立中...';
+  try {
+    const limit = parseInt(document.getElementById('limit').value) || 50;
+    const depth = parseInt(document.getElementById('depth').value) || 3;
+    const fast_mode = document.getElementById('fastMode').checked;
+    const job = await api(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, limit, max_depth: depth, fast_mode }),
+    });
+    if (job.error) return alert(job.error);
+    loadJobs();
+    subscribeSSE(job.job_id);
+  } finally { btn.disabled = false; btn.textContent = '開始爬取'; }
+}
+
+function subscribeSSE(jobId) {
+  if (streams[jobId]) streams[jobId].close();
+  const es = new EventSource(`${API}/${jobId}/stream`);
+  streams[jobId] = es;
+  es.onmessage = (e) => {
+    const d = JSON.parse(e.data);
+    updateJobCard(d);
+    if (['completed','failed','paused'].includes(d.status)) {
+      es.close(); delete streams[jobId];
+      setTimeout(() => loadJobs(), 300);
+    }
+  };
+  es.onerror = () => { es.close(); delete streams[jobId]; };
+}
+
+async function pauseJob(id) {
+  await api(`${API}/${id}/pause`, { method:'POST' });
+  if (streams[id]) { streams[id].close(); delete streams[id]; }
+  loadJobs();
+}
+
+async function resumeJob(id) {
+  await api(`${API}/${id}/resume`, { method:'POST' });
+  loadJobs();
+  subscribeSSE(id);
+}
+
+async function retryFailed(id) {
+  await api(`${API}/${id}/retry-failed`, { method:'POST' });
+  loadJobs();
+  subscribeSSE(id);
+}
+
+async function deleteJob(id) {
+  if (!confirm('確定要刪除此任務？')) return;
+  await api(`${API}/${id}`, { method:'DELETE' });
+  if (streams[id]) { streams[id].close(); delete streams[id]; }
+  loadJobs();
+}
+
+function toggleLogs(id) { document.getElementById(`logs-${id}`).classList.toggle('open'); }
+
+function toggleResults(id) {
+  const el = document.getElementById(`results-${id}`);
+  if (el.classList.contains('open')) { el.classList.remove('open'); return; }
+  api(`${API}/${id}/results`).then(results => {
+    el.querySelector('.results-list').innerHTML = results.map((r, i) => `
+      <div class="result-item" onclick="showDetail('${id}',${i})">
+        <div class="result-item-url">${esc(r.url)}</div>
+        <div class="result-item-status ${r.error?'err':'ok'}">
+          ${r.error ? '&#10007; '+esc(r.error).slice(0,120) : '&#10003; 成功 — '+((r.markdown||'').length)+' 字'}
+        </div>
+      </div>
+    `).join('');
+    el.classList.add('open');
+  });
+}
+
+async function showDetail(jobId, idx) {
+  const item = await api(`${API}/${jobId}/results/${idx}`);
+  document.getElementById('modalTitle').textContent = item.url;
+  document.getElementById('modalBody').textContent =
+    item.error ? `錯誤：${item.error}` : (item.markdown || '（無 Markdown 內容）');
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('active'); }
+document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
+function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+function badgeCls(s) { return `badge badge-${s}`; }
+function statusLabel(s) {
+  return {pending:'等待中',running:'爬取中',paused:'已暫停',completed:'已完成',failed:'失敗'}[s]||s;
+}
+function formatLog(line) {
+  if (line.includes('✓')) return `<span class="log-ok">${esc(line)}</span>`;
+  if (line.includes('✗')) return `<span class="log-err">${esc(line)}</span>`;
+  return esc(line);
+}
+
+function updateJobCard(job) {
+  const el = document.getElementById(`job-${job.job_id}`);
+  if (!el) { loadJobs(); return; }
+  el.querySelector('.badge').className = badgeCls(job.status);
+  el.querySelector('.badge').textContent = statusLabel(job.status);
+
+  const total = job.total_discovered || 1;
+  const done = job.total_scraped + job.total_failed;
+  const pct = Math.min(100, Math.round((done/total)*100));
+  const fill = el.querySelector('.progress-bar-fill');
+  fill.style.width = pct + '%';
+  fill.className = 'progress-bar-fill' + (job.status==='completed' ? ' done' : '');
+  el.querySelector('.progress-text').innerHTML =
+    `<span>成功 ${job.total_scraped} · 失敗 ${job.total_failed} / 共 ${total} 頁</span><span>${pct}%</span>`;
+
+  const logEl = el.querySelector('.log-lines');
+  if (logEl && job.logs) {
+    logEl.innerHTML = job.logs.map(formatLog).join('\n');
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+}
+
+function renderJob(job) {
+  const total = job.total_discovered || 1;
+  const done = job.total_scraped + job.total_failed;
+  const pct = Math.min(100, Math.round((done/total)*100));
+
+  let actions = '';
+  if (job.status === 'running')
+    actions += `<button class="btn btn-warning btn-sm" onclick="pauseJob('${job.job_id}')">⏸ 暫停</button>`;
+  if (job.status === 'paused' || job.status === 'failed')
+    actions += `<button class="btn btn-success btn-sm" onclick="resumeJob('${job.job_id}')">▶ 續傳</button>`;
+  if ((job.status === 'completed' || job.status === 'paused') && job.total_failed > 0)
+    actions += `<button class="btn btn-outline btn-sm" onclick="retryFailed('${job.job_id}')">🔄 重試失敗</button>`;
+
+  actions += `<button class="btn btn-outline btn-sm" onclick="toggleLogs('${job.job_id}')">📋 日誌</button>`;
+  if (done > 0)
+    actions += `<button class="btn btn-outline btn-sm" onclick="toggleResults('${job.job_id}')">📄 結果 (${job.total_scraped})</button>`;
+  if (job.status === 'completed' || done > 0)
+    actions += `<a class="btn btn-outline btn-sm" href="${API}/${job.job_id}/download" target="_blank">⬇ 下載</a>`;
+  actions += `<button class="btn btn-danger btn-sm" onclick="deleteJob('${job.job_id}')">🗑</button>`;
+
+  const logsHtml = (job.logs || []).map(formatLog).join('\n');
+  const modeTag = job.fast_mode ? '<span style="color:var(--warning)">快速</span>' : '完整';
+
+  return `
+  <div class="job-card" id="job-${job.job_id}">
+    <div class="job-header">
+      <div>
+        <div class="job-url">${esc(job.url)}</div>
+        <div class="job-meta">
+          <span>ID: ${job.job_id}</span>
+          <span>模式: ${modeTag}</span>
+          <span>上限 ${job.limit} 頁</span>
+          <span>深度 ${job.max_depth}</span>
+          <span>${new Date(job.created_at).toLocaleString('zh-TW')}</span>
+        </div>
+      </div>
+      <span class="${badgeCls(job.status)}">${statusLabel(job.status)}</span>
+    </div>
+    <div class="job-progress">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill${job.status==='completed'?' done':''}" style="width:${pct}%"></div>
+      </div>
+      <div class="progress-text">
+        <span>成功 ${job.total_scraped} · 失敗 ${job.total_failed} / 共 ${total} 頁</span><span>${pct}%</span>
+      </div>
+    </div>
+    <div class="job-actions">${actions}</div>
+    <div class="log-panel${job.status==='running'?' open':''}" id="logs-${job.job_id}">
+      <h4>爬取日誌</h4>
+      <div class="log-lines">${logsHtml}</div>
+    </div>
+    <div class="results-panel" id="results-${job.job_id}">
+      <div class="results-list"></div>
+    </div>
+  </div>`;
+}
+
+async function loadJobs() {
+  const list = await api(API);
+  const el = document.getElementById('jobList');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><h3>尚無爬取任務</h3><p>在上方輸入網址，開始你的第一個爬取任務</p></div>';
+    return;
+  }
+  list.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  el.innerHTML = list.map(renderJob).join('');
+  list.forEach(j => {
+    if (j.status === 'running' && !streams[j.job_id]) subscribeSSE(j.job_id);
+  });
+}
+
+loadJobs();
+</script>
+</body>
+</html>

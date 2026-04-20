@@ -30,45 +30,54 @@ OUTPUT_DIR = Path("output")
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 
-def scrape_url(url: str, formats: list[str] | None = None) -> dict:
+def scrape_url(url: str, formats: list[str] | None = None):
     """抓取單一頁面，回傳 Markdown 內容"""
-    params = {}
+    kwargs = {}
     if formats:
-        params["formats"] = formats
+        kwargs["formats"] = formats
     else:
-        params["formats"] = ["markdown"]
+        kwargs["formats"] = ["markdown"]
 
-    result = app.scrape_url(url, params=params)
+    result = app.scrape(url, **kwargs)
     return result
 
 
-def crawl_url(url: str, limit: int = 10, max_depth: int = 2) -> dict:
+def crawl_url(url: str, limit: int = 10, max_depth: int = 2):
     """爬取整個網站"""
-    result = app.crawl_url(
+    result = app.crawl(
         url,
-        params={
-            "limit": limit,
-            "maxDepth": max_depth,
-            "scrapeOptions": {"formats": ["markdown"]},
-        },
+        limit=limit,
+        max_discovery_depth=max_depth,
     )
     return result
 
 
-def map_url(url: str) -> list:
+def map_url(url: str):
     """取得網站的 URL 地圖"""
-    result = app.map_url(url)
+    result = app.map(url)
     return result
+
+
+def to_serializable(obj):
+    """將 Firecrawl 回傳的物件轉為可序列化的 dict/list"""
+    if hasattr(obj, "model_dump"):
+        return obj.model_dump()
+    if hasattr(obj, "__dict__"):
+        return obj.__dict__
+    if isinstance(obj, list):
+        return [to_serializable(item) for item in obj]
+    return obj
 
 
 def save_result(data, filename: str):
     """將結果儲存到 output 資料夾"""
     filepath = OUTPUT_DIR / filename
+    serializable = to_serializable(data)
     with open(filepath, "w", encoding="utf-8") as f:
-        if isinstance(data, (dict, list)):
-            json.dump(data, f, ensure_ascii=False, indent=2)
+        if isinstance(serializable, (dict, list)):
+            json.dump(serializable, f, ensure_ascii=False, indent=2)
         else:
-            f.write(str(data))
+            f.write(str(serializable))
     print(f"結果已儲存至：{filepath}")
 
 
@@ -111,26 +120,29 @@ def main():
     if args.command == "scrape":
         print(f"正在抓取：{args.url}")
         result = scrape_url(args.url, formats=args.formats)
+        serializable = to_serializable(result)
         if args.output:
             save_result(result, args.output)
         else:
-            print(json.dumps(result, ensure_ascii=False, indent=2))
+            print(json.dumps(serializable, ensure_ascii=False, indent=2))
 
     elif args.command == "crawl":
         print(f"正在爬取：{args.url}（上限 {args.limit} 頁，深度 {args.depth}）")
         result = crawl_url(args.url, limit=args.limit, max_depth=args.depth)
+        serializable = to_serializable(result)
         if args.output:
             save_result(result, args.output)
         else:
-            print(json.dumps(result, ensure_ascii=False, indent=2))
+            print(json.dumps(serializable, ensure_ascii=False, indent=2))
 
     elif args.command == "map":
         print(f"正在取得網站地圖：{args.url}")
         result = map_url(args.url)
+        serializable = to_serializable(result)
         if args.output:
             save_result(result, args.output)
         else:
-            print(json.dumps(result, ensure_ascii=False, indent=2))
+            print(json.dumps(serializable, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

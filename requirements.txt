@@ -1,0 +1,2 @@
+firecrawl-py>=4.22.2
+python-dotenv>=1.2.2
